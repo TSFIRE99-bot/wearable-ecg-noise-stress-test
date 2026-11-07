@@ -6,8 +6,8 @@ it does not peer review. Everything below is already in the manuscript, so the f
 
 ## Before you start
 - [ ] Zenodo DOI added (switch the repository on at zenodo.org → GitHub, then a new release; see `docs/submission_checklist.md`).
-- [ ] Funding and competing-interests statements confirmed (remove "[Confirm.]" in `paper/manuscript.md`).
-- [ ] Ethics sentence confirmed (remove the bracketed note).
+- [x] Funding and competing-interests statements confirmed (none and none).
+- [x] Ethics statement finalized.
 - [ ] Rebuild the files: `python scripts/build_manuscript_docx.py`, then open `paper/submission/manuscript.docx` in Word and
       save it as PDF (or upload the .docx directly).
 
@@ -25,8 +25,8 @@ it does not peer review. Everything below is already in the manuscript, so the f
 | Title | A real-noise stress-testing framework for wearable ECG classifiers: development and external validation with atrial fibrillation detection as a worked example |
 | Author | Tejas Menneni, Columbus State Community College, Columbus, Ohio, USA (corresponding; tejas.menneni@gmail.com; add ORCID if you have one) |
 | Abstract | Paste the abstract from the manuscript as plain text |
-| Competing interests | "The author has declared no competing interest." (only if true) |
-| Funding statement | "This study did not receive any funding." (only if true) |
+| Competing interests | "The author has declared no competing interest." |
+| Funding statement | "This study did not receive any funding." |
 | Clinical trial | No / not applicable |
 | Ethics: IRB/oversight body | Choose the option for studies that use **only openly available human data**, and give the sources: https://doi.org/10.13026/D3D0-0F49 (CinC 2017), https://doi.org/10.13026/KFZX-AW45 (PTB-XL), https://doi.org/10.13026/C2HS3T (MIT-BIH NSTDB) |
 | Consent | Not applicable: de-identified, openly available data |
