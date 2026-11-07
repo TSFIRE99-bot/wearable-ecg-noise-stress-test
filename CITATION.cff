@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the accompanying article and this archive."
+title: "ecgrobust: a framework for evaluating wearable ECG classifiers under real-world noise"
+version: 0.1.0
+date-released: 2026-11-05
+license: MIT
+authors:
+  - family-names: "Menneni"
+    given-names: "Tejas"
+    affiliation: "Columbus State Community College"
+    # orcid: "https://orcid.org/XXXX-XXXX-XXXX-XXXX"   <- add if you create one (free at orcid.org)
+# doi: 10.5281/zenodo.XXXXXXX   <- fill in after the first Zenodo release
+references:
+  - type: dataset
+    title: "AF Classification from a Short Single Lead ECG Recording: The PhysioNet/Computing in Cardiology Challenge 2017"
+    doi: 10.13026/D3D0-0F49
+  - type: dataset
+    title: "PTB-XL, a large publicly available electrocardiography dataset (v1.0.3)"
+    doi: 10.13026/KFZX-AW45
+  - type: dataset
+    title: "MIT-BIH Noise Stress Test Database"
+    doi: 10.13026/C2HS3T
