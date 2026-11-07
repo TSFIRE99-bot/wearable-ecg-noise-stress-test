@@ -8,14 +8,14 @@ it does not peer review. Everything below is already in the manuscript, so the f
 - [x] Zenodo DOI added: https://doi.org/10.5281/zenodo.24042753.
 - [x] Funding and competing-interests statements confirmed (none and none).
 - [x] Ethics statement finalized.
-- [ ] Rebuild the files: `python scripts/build_manuscript_docx.py`, then open `paper/submission/manuscript.docx` in Word and
-      save it as PDF (or upload the .docx directly).
+- [x] Files built. To rebuild after any edit: `python scripts/build_manuscript_docx.py`, `python scripts/build_supplement_docx.py`,
+      then `powershell -ExecutionPolicy Bypass -File scripts/docx_to_pdf.ps1`.
 
 ## Files to upload
 | medRxiv field | File |
 |---|---|
 | Manuscript (PDF or Word, figures and tables included) | `paper/submission/manuscript.pdf` or `manuscript.docx` |
-| Supplementary material (optional) | `docs/TRIPOD_AI_checklist.md` saved as PDF |
+| Supplementary material (separate file, required here) | `paper/submission/supplementary.pdf` (Fig. S1, Tables S1–S3) |
 
 ## Form answers
 | Field | Answer |

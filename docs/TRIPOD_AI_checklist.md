@@ -8,7 +8,7 @@ page numbers.
 | Section | Topic | Where / how addressed |
 |---|---|---|
 | Title | Identify as development + external evaluation of a prediction model; population; outcome | "…development and external validation…, single-lead AF detection…" (manuscript) |
-| Abstract | Structured per TRIPOD+AI for Abstracts | Manuscript |
+| Abstract | Objective, data, models, validation, main results and conclusion (TRIPOD+AI for Abstracts items) | Manuscript abstract |
 | Introduction | Clinical context: consumer-wearable AF screening; why noise robustness matters | Intro ¶1–2 |
 | | Rationale for the models and the existing evidence (CinC 2017 literature) | Intro ¶3; four-class score for comparability (`fourclass_challenge.csv`) |
 | | Health inequalities / fairness considerations | Discussion: PTB-XL age/sex subgroup performance (`subgroups_external.csv`) |
