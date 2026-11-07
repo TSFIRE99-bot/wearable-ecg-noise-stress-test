@@ -5,6 +5,8 @@ with atrial fibrillation (AF) detection as the worked example.
 
 Author: Tejas Menneni, Columbus State Community College.
 
+Archived on Zenodo: [doi:10.5281/zenodo.24042752](https://doi.org/10.5281/zenodo.24042752) (all versions; the manuscript cites v1.0.2, [doi:10.5281/zenodo.24042753](https://doi.org/10.5281/zenodo.24042753)).
+
 | Role | Dataset | What it gives the study |
 |---|---|---|
 | Development + internal test | PhysioNet/CinC 2017 (8,528 AliveCor single-lead ECGs, 300 Hz, 9–60 s) | Realistic consumer-device recordings |
