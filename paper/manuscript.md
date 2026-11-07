@@ -203,7 +203,7 @@ bootstrap intervals. The CinC 2017 data contain no demographic information.
 
 Analyses used Python 3.13 with NeuroKit2 0.3.0, scikit-learn 1.9.1, LightGBM 4.7.0, PyTorch 2.15 and SHAP 0.54.1. All
 random processes are seeded from a single configuration file. The code, configuration and exact package versions are
-available at [GitHub URL] and archived at [Zenodo DOI].
+available at https://github.com/TSFIRE99-bot/wearable-ecg-noise-stress-test and archived at [Zenodo DOI].
 
 ## 3. Results
 
@@ -382,7 +382,7 @@ original approval.]
 **Data availability.** PhysioNet/Computing in Cardiology Challenge 2017 (https://doi.org/10.13026/D3D0-0F49); PTB-XL v1.0.3
 (https://doi.org/10.13026/KFZX-AW45); MIT-BIH Noise Stress Test Database (https://doi.org/10.13026/C2HS3T).
 
-**Code availability.** [GitHub URL]; archived at [Zenodo DOI]. MIT licence.
+**Code availability.** https://github.com/TSFIRE99-bot/wearable-ecg-noise-stress-test; archived at [Zenodo DOI]. MIT licence.
 
 **Funding.** This research received no specific grant from any funding agency. [Confirm.]
 

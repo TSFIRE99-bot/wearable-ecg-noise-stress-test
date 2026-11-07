@@ -9,6 +9,7 @@ authors:
     given-names: "Tejas"
     affiliation: "Columbus State Community College"
     # orcid: "https://orcid.org/XXXX-XXXX-XXXX-XXXX"   <- add if you create one (free at orcid.org)
+repository-code: "https://github.com/TSFIRE99-bot/wearable-ecg-noise-stress-test"
 # doi: 10.5281/zenodo.XXXXXXX   <- fill in after the first Zenodo release
 references:
   - type: dataset
