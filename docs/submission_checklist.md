@@ -2,13 +2,13 @@
 
 ## Before posting anywhere
 - [x] Author set to Tejas Menneni, Columbus State Community College (manuscript, `CITATION.cff`, `.zenodo.json`, `LICENSE`).
-- [ ] Add the corresponding email to the manuscript; optionally create an ORCID (free) and add it to `CITATION.cff`.
+- [x] Corresponding email added. Optionally create an ORCID (free) and add it to `CITATION.cff`.
 - [ ] Review the funding, competing-interests and generative-AI declarations (drafted; marked [Confirm.]).
-- [ ] Verify every reference against its source (entries marked *[verify]*: Zhao 2018; the CinC 2017 winning score ≈ 0.83).
-- [ ] Add 2–4 citations of prior ECG-robustness / noise-stress work in the Discussion placeholder.
+- [x] Flagged references verified (Zhao 2018; CinC 2017 winning score 0.83) and DOIs added.
+- [x] Prior work cited: Venton 2021, Behar 2013, Andreotti 2017, Mannhart 2023.
 - [ ] Check the abstract word limit of the target journal (the current abstract is 255 words including section labels; trim if the limit is 250).
 - [ ] Check the ethics wording against your institution's policy.
-- [ ] Draw the participant flow diagram (8,528 → split → binary exclusions; PTB-XL counts).
+- [x] Participant flow diagram: `outputs/figures/fig0_flow.png` (Supplementary Fig. S1).
 - [ ] Re-read the limitations (9 items) and keep all of them.
 
 ## Code release (needed for the DOI cited in the paper)

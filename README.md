@@ -156,4 +156,6 @@ All data are openly available from PhysioNet: the PhysioNet/Computing in Cardiol
 (https://doi.org/10.13026/D3D0-0F49), PTB-XL v1.0.3 (https://doi.org/10.13026/KFZX-AW45), and the MIT-BIH Noise
 Stress Test Database (https://doi.org/10.13026/C2HS3T). No new data were collected.
 
-The manuscript is in `paper/manuscript.md`, and the TRIPOD+AI reporting checklist is in `docs/TRIPOD_AI_checklist.md`.
+The manuscript is in `paper/manuscript.md`; `scripts/build_manuscript_docx.py` builds the submission Word file in
+`paper/submission/`, and `scripts/make_flow_diagram.py` draws the participant flow diagram (`fig0_flow.png`). The
+TRIPOD+AI reporting checklist, the submission checklist and a medRxiv form guide are in `docs/`.

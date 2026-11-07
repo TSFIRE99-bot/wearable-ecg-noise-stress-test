@@ -34,7 +34,7 @@ page numbers.
 | | Data sharing | Data availability statement (README) |
 | | Code sharing | GitHub + Zenodo DOI; fixed seeds; `requirements.txt` |
 | Patient involvement | PPI | State "none" if none |
-| Results | Participant flow and characteristics | Table 1 (`table1_cohorts.csv`): counts, AF prevalence, PTB-XL age/sex. A flow diagram (8,528 → split → binary exclusions; PTB-XL counts) still needs to be drawn |
+| Results | Participant flow and characteristics | Table 1 (`table1_cohorts.csv`): counts, AF prevalence, PTB-XL age/sex. flow diagram in Supplementary Fig. S1 (`fig0_flow.png`, made by `scripts/make_flow_diagram.py`) |
 | | Model development details | `best_params` in each bundle; CV scores |
 | | Full model specification | Code + archived model files |
 | | Performance with CIs, internal and external | `main_internal.csv`, `main_external.csv` |
