@@ -1,0 +1,35 @@
+{
+  "n_bootstrap": 1000,
+  "conditions": [
+    "internal__clean",
+    "internal__bw__+24dB__r0",
+    "internal__bw__+18dB__r0",
+    "internal__bw__+12dB__r0",
+    "internal__bw__+6dB__r0",
+    "internal__bw__+0dB__r0",
+    "internal__bw__-6dB__r0",
+    "internal__ma__+24dB__r0",
+    "internal__ma__+18dB__r0",
+    "internal__ma__+12dB__r0",
+    "internal__ma__+6dB__r0",
+    "internal__ma__+0dB__r0",
+    "internal__ma__-6dB__r0",
+    "internal__em__+24dB__r0",
+    "internal__em__+18dB__r0",
+    "internal__em__+12dB__r0",
+    "internal__em__+6dB__r0",
+    "internal__em__+0dB__r0",
+    "internal__em__-6dB__r0",
+    "external__clean"
+  ],
+  "models": [
+    "rule",
+    "logreg",
+    "lgbm",
+    "cnn"
+  ],
+  "variants": [
+    "standard",
+    "augmented"
+  ]
+}

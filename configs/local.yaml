@@ -1,0 +1,14 @@
+# Full study on this machine: raw/processed data on a short path (Windows 260-char limit).
+extends: default.yaml
+
+paths:
+  raw_dir: C:/Users/tejas/ecg-data/raw
+  processed_dir: C:/Users/tejas/ecg-data/processed
+
+data:
+  cinc2017:
+    dir: C:/Users/tejas/ecg-data/raw/challenge-2017
+  ptbxl:
+    dir: C:/Users/tejas/ecg-data/raw/ptb-xl
+  nstdb:
+    dir: C:/Users/tejas/ecg-data/raw/nstdb

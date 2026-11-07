@@ -1,0 +1,16 @@
+data/
+*.log
+__pycache__/
+*.egg-info/
+.venv/
+.pytest_cache/
+pip-freeze.txt.bak
+
+# outputs: keep only what reviewers need (tables, figures, split + test-lock audit trail)
+outputs*/*
+!outputs/tables/
+!outputs/figures/
+!outputs/splits.json
+!outputs/TEST_SET_UNLOCKED.json
+!outputs/environment_*.json
+paper/archive/

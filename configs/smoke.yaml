@@ -1,0 +1,43 @@
+# Tiny end-to-end run on synthetic signals. Checks that every stage executes;
+# the numbers it produces mean nothing.
+extends: default.yaml
+
+output_dir: outputs_smoke
+paths:
+  processed_dir: data/processed_smoke
+
+data:
+  synthetic: true
+  synthetic_n_internal: 240
+  synthetic_n_external: 120
+
+seeds: [0, 1]
+cv_folds: 3
+
+noise:
+  snr_db: [12, 0]
+
+models:
+  lgbm:
+    n_iter: 3
+  logreg:
+    C: [0.1, 1.0]
+    penalty: [l2]
+  cnn:
+    max_epochs: 2
+    patience: 1
+    grid:
+      lr: [0.001]
+      dropout: [0.3]
+      weight_decay: [0.0001]
+
+fourclass:
+  models: [logreg, lgbm, cnn]
+  seeds: [0]
+
+evaluation:
+  external_noise: true
+  bootstrap: 50
+
+shap:
+  max_samples: 100

@@ -1,0 +1,4 @@
+set,recordings,patients,class_counts,binary_task_n,AF_n,AF_pct,duration_s_median_IQR,age_median_IQR,female_pct
+CinC 2017 development,6822,not available,"N 4040, O 1965, A 590, ~ 227",6595,590,8.9,30.0 (30.0–30.0),not available,not available
+CinC 2017 internal test,1706,not available,"N 1010, O 491, A 148, ~ 57",1649,148,9.0,30.0 (30.0–30.0),not available,not available
+PTB-XL lead I (external),21799,18869,,21799,1514,6.9,10.0 (10.0–10.0),62.0 (50.0–72.0),47.9

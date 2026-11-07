@@ -1,0 +1,114 @@
+# Default configuration for the full study.
+# Every random process is seeded from values in this file, so a run is fully
+# reproducible from (code version, this file, the three public datasets).
+
+output_dir: outputs
+
+paths:
+  raw_dir: data/raw
+  processed_dir: data/processed
+
+fs: 300                      # common sampling rate (Hz); CinC 2017 native rate
+
+data:
+  synthetic: false           # true only for the smoke test (configs/smoke.yaml)
+  cinc2017:
+    dir: data/raw/challenge-2017
+    # Three label versions ship with the data:
+    #   training2017/REFERENCE-original.csv  5154 N / 771 A / 2557 O /  46 ~  (initial release)
+    #   training2017/REFERENCE.csv           5050 N / 738 A / 2456 O / 284 ~  (used by most papers)
+    #   REFERENCE-v3.csv                     5076 N / 758 A / 2415 O / 279 ~  (post-challenge relabel)
+    # Default = the most-cited version, for comparability; v3 is a sensitivity analysis.
+    reference: training2017/REFERENCE.csv
+  ptbxl:
+    dir: data/raw/ptb-xl
+    lead: I
+    af_codes: [AFIB]          # SCP statement(s) that define AF
+    exclude_codes: []         # e.g. [AFLT] to drop flutter instead of calling it non-AF
+  nstdb:
+    dir: data/raw/nstdb
+    records: [bw, ma, em]
+
+split:
+  test_fraction: 0.20
+  seed: 2017                 # fixed: the internal test set never changes across model seeds
+  stratify_on: label4        # stratify on the 4 original classes -> same AF proportion
+
+seeds: [0, 1, 2, 3, 4]        # model-training seeds (CV folds, init, subsampling)
+cv_folds: 5
+
+noise:
+  types: [bw, ma, em]        # baseline wander, muscle artifact, electrode motion
+  snr_db: [24, 18, 12, 6, 0, -6]
+  test_realizations: 1       # independent noise draws per (record, noise type)
+  train_fraction: 0.5        # first half of each NSTDB record -> training augmentation,
+                             # second half -> test corruption (no shared noise samples)
+  seed: 4242
+
+augmentation:
+  enabled: true
+  copies: 1                  # noisy copies of each training record for the feature models
+  snr_range: [-6, 24]        # uniform in dB
+  p_noise_cnn: 0.5           # probability a CNN training crop is corrupted
+  seed: 777
+
+features:
+  n_jobs: -1
+  rr_min_ms: 250             # physiologically plausible RR range used for HRV features
+  rr_max_ms: 2000
+  min_beats: 5
+  beat_match_tolerance_ms: 150   # ANSI/AAMI EC57 matching window
+
+models:
+  binary: [rule, logreg, lgbm, cnn]
+  tuning_metric: average_precision
+  rule:
+    feature: rr_rmssd_norm   # RMSSD / mean RR: a single beat-irregularity measure
+  logreg:
+    C: [0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
+    penalty: [l1, l2]
+  lgbm:
+    n_iter: 40               # randomized-search candidates
+  cnn:
+    window_s: 9
+    stride_s: 3
+    # v1 (cosine LR, 30 epochs, stem pool 2) was still improving at epoch 30 -> undertrained.
+    # v2: 2x cheaper stem, one-cycle LR, up to 60 epochs.
+    max_epochs: 60
+    patience: 12
+    min_epochs: 60           # = max_epochs: run the full one-cycle schedule, keep the best epoch.
+                             # (Early stopping fired during warm-up / a transient divergence at peak LR
+                             # in development: folds stopped at best epochs 7-12 with AUPRC 0.58-0.69.)
+    grad_clip: 1.0           # gradient-norm clipping (stabilizes the peak-learning-rate phase)
+    schedule: onecycle       # grid "lr" = peak learning rate
+    stem_pool: 4
+    tune_once: true          # grid-search by 5-fold CV once (binary, standard, first seed); reuse elsewhere
+    calibration: holdout     # Platt + threshold from the final fit's inner validation split
+                             # (per-seed 5-fold OOF is ~6x the CPU cost); use "oof" on a GPU
+    batch_size: 128
+    inner_val_fraction: 0.15 # early-stopping / calibration split carved out of the training data
+    base_channels: 32
+    sign_flip: true          # handheld recordings can be polarity-inverted
+    num_threads: 0           # 0 = torch default
+    grid:
+      lr: [0.003, 0.001]
+      dropout: [0.3]
+      weight_decay: [0.0001]
+
+fourclass:
+  enabled: true
+  models: [logreg, lgbm, cnn]
+  seeds: [0, 1, 2, 3, 4]
+  cnn_seeds: [0]             # CPU budget: secondary comparability analysis only
+
+evaluation:
+  external_noise: false      # also corrupt PTB-XL (adds ~22k x 18 feature extractions)
+  bootstrap: 1000
+  bootstrap_seed: 99
+  quality_score: q_avgqrs    # score used for abstention (NeuroKit2 averageQRS, mean)
+  abstention_coverages: [1.0, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.6, 0.5]
+  fixed_quality_percentiles: [1, 5, 10]   # thresholds set on *training* quality
+  calibration_bins: 10
+
+shap:
+  max_samples: 2000

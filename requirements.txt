@@ -1,0 +1,20 @@
+# Exact versions used to develop and test the pipeline (Python 3.13, Windows 11, CPU).
+# A full transitive lock is in pip-freeze.txt.
+# For CUDA, install torch from https://pytorch.org for your platform first, then the rest.
+numpy==2.5.4
+scipy==1.18.1
+pandas==3.1.1
+pyarrow==26.0.1
+scikit-learn==1.9.1
+lightgbm==4.7.0
+neurokit2==0.3.0
+PyWavelets
+wfdb==4.3.1
+torch==2.15.0
+shap==0.54.1
+matplotlib==3.11.2
+PyYAML==6.0.3
+joblib==1.6.0
+tabulate
+tqdm
+pytest
