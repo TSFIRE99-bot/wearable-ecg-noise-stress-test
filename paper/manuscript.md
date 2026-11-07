@@ -6,8 +6,7 @@
 
 > Draft status: complete first draft. All numbers were copied from `outputs/tables/` (run of 2026-11-07; test set unlocked
 > 03:40 after all models were frozen). To regenerate a number, see the table named next to each result. Before submission:
-> add the Zenodo DOI, confirm the funding and competing-interest statements, and confirm the abstract word limit for the
-> target journal.
+> add the Zenodo DOI and confirm the abstract word limit for the target journal.
 
 ---
 
@@ -383,18 +382,18 @@ quality gates on the target device. The open-source code runs the full protocol 
 
 ## Declarations
 
-**Ethics.** This is a secondary analysis of de-identified data that are openly available on PhysioNet. No new data were
-collected, and no additional ethical approval was required. [Check your institution's policy and cite each dataset's
-original approval.]
+**Ethics.** This study is a secondary analysis of de-identified data that are openly available on PhysioNet. No new data
+were collected and no participants were contacted. Each dataset was collected and released under the approvals described
+in its original publication [Clifford 2017; Wagner 2020; Moody 1984].
 
 **Data availability.** PhysioNet/Computing in Cardiology Challenge 2017 (https://doi.org/10.13026/D3D0-0F49); PTB-XL v1.0.3
 (https://doi.org/10.13026/KFZX-AW45); MIT-BIH Noise Stress Test Database (https://doi.org/10.13026/C2HS3T).
 
 **Code availability.** https://github.com/TSFIRE99-bot/wearable-ecg-noise-stress-test; archived at [Zenodo DOI]. MIT licence.
 
-**Funding.** This research received no specific grant from any funding agency. [Confirm.]
+**Funding.** This research received no specific grant from any funding agency.
 
-**Competing interests.** The author declares no competing interests. [Confirm.]
+**Competing interests.** The author declares no competing interests.
 
 **Author contributions (CRediT).** Tejas Menneni: Conceptualization, Methodology, Software, Formal analysis,
 Investigation, Data curation, Visualization, Writing – original draft, Writing – review & editing.
