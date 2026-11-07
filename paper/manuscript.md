@@ -1,4 +1,4 @@
-# A real-noise stress-testing framework for wearable ECG classifiers: development and external validation with atrial fibrillation detection as a worked example
+# Stress-testing wearable ECG atrial fibrillation classifiers with real recorded noise
 
 **Author:** Tejas Menneni, Columbus State Community College, Columbus, Ohio, USA
 

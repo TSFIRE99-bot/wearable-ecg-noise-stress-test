@@ -22,7 +22,7 @@ it does not peer review. Everything below is already in the manuscript, so the f
 |---|---|
 | Article type | New Results; category: **Study on diagnostic tools or medical equipment** |
 | Subject area | Cardiovascular Medicine (alternative: Health Informatics) |
-| Title | A real-noise stress-testing framework for wearable ECG classifiers: development and external validation with atrial fibrillation detection as a worked example |
+| Title | Stress-testing wearable ECG atrial fibrillation classifiers with real recorded noise |
 | Author | Tejas Menneni, Columbus State Community College, Columbus, Ohio, USA (corresponding; tejas.menneni@gmail.com; add ORCID if you have one) |
 | Abstract | Paste the abstract from the manuscript as plain text |
 | Competing interests | "The author has declared no competing interest." |
