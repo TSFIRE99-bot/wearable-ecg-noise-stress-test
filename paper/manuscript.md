@@ -2,12 +2,12 @@
 
 **Author:** Tejas Menneni, Columbus State Community College, Columbus, Ohio, USA
 
-**Corresponding author:** Tejas Menneni ([email to be added])
+**Corresponding author:** Tejas Menneni (tejas.menneni@gmail.com)
 
 > Draft status: complete first draft. All numbers were copied from `outputs/tables/` (run of 2026-11-07; test set unlocked
 > 03:40 after all models were frozen). To regenerate a number, see the table named next to each result. Before submission:
-> add the corresponding email, GitHub/Zenodo links and declarations, check every reference marked *[verify]*, and confirm the
-> abstract word limit for the target journal.
+> add the Zenodo DOI, confirm the funding and competing-interest statements, and confirm the abstract word limit for the
+> target journal.
 
 ---
 
@@ -42,14 +42,17 @@ openly available.
 
 Smartwatches and handheld devices now record single-lead ECGs from millions of people, and AF detection is their flagship
 clinical application [Perez 2019]. The recordings are short, taken by untrained users, and are often degraded by electrode
-motion, muscle activity and baseline drift. A classifier that performs well on clean data can still fail on the noisy
-recordings that make up a substantial share of real-world use.
+motion, muscle activity and baseline drift. In a clinical comparison of five consumer devices, the devices' own
+algorithms labelled 17–26% of single-lead tracings inconclusive [Mannhart 2023]. A classifier that performs well on
+clean data can still fail on these noisy recordings.
 
 Most single-lead AF classifiers, including the large literature built on the PhysioNet/Computing in Cardiology (CinC)
 Challenge 2017 [Clifford 2017], are evaluated on held-out recordings from the same device and population. Robustness to noise
-is rarely measured. When it is, the noise is usually synthetic (white noise, sinusoids), which lacks the non-stationary,
-morphology-mimicking character of real electrode motion. It is also rarely asked why a model fails under noise, whether
-the failure can be reduced, and what a device should do when it cannot classify a recording reliably.
+is measured less often. Venton et al. added physiological noise to ECGs and found that a CNN trained on clean data lost up
+to 0.18 F1, while training on noisy data limited the loss [Venton 2021]. Studies that use synthetic noise (white noise,
+sinusoids) miss the non-stationary, morphology-mimicking character of real electrode motion. It is also rarely asked why a
+model fails under noise, whether the failure can be reduced, and what a device should do when it cannot classify a recording
+reliably.
 
 We built a reusable evaluation framework to answer these questions and applied it to AF detection. It has six parts:
 
@@ -211,7 +214,7 @@ Values are means over five seeds (± SD across seeds) with 95% bootstrap confide
 replicates, the smallest attainable p-value is 0.001, or 0.005 after Holm adjustment within a family of five comparisons.
 
 ### 3.1 Cohorts
-*(Table 1 ← `table1_cohorts.csv`)* The development set contained 6,822 recordings, of which 6,595 were used for the binary task
+*(Table 1 ← `table1_cohorts.csv`; participant flow: Supplementary Fig. S1 ← `fig0_flow.png`)* The development set contained 6,822 recordings, of which 6,595 were used for the binary task
 (590 AF, 8.9%). The internal test set contained 1,706 recordings (1,649 binary; 148 AF, 9.0%). Most CinC recordings lasted
 30 s. PTB-XL contributed 21,799 ten-second recordings from 18,869 patients (1,514 AF, 6.9%). The median age was 62 years (IQR 50–72), and 47.9% of
 patients were female.
@@ -331,18 +334,23 @@ almost no effect. (ii) Use noise augmentation by default. It cost nothing on cle
 was the only intervention that improved performance under severe noise. (iii) Do not assume that a signal-quality gate
 fixes noise. The NeuroKit2 average-QRS index withheld up to a
 quarter of severely corrupted recordings but barely improved accuracy on the rest. It preferentially withheld AF
-recordings, likely because irregular beats reduce QRS-template agreement, and a threshold set on training data would have
-rejected half of the clean recordings from a different device. Quality thresholds must be re-derived for each device and
-evaluated for their effect on sensitivity.
+recordings, which is consistent with earlier evidence that signal-quality indices perform worse during arrhythmias and
+should be rhythm specific [Behar 2013]. A threshold set on training data would also have rejected half of the clean
+recordings from a different device. Quality thresholds must be re-derived for each device and evaluated for their effect
+on sensitivity, particularly since consumer devices already return inconclusive results for about one in four tracings
+[Mannhart 2023].
 
-**Comparison with prior work.** Our four-class challenge scores (0.80 for the CNN and gradient boosting) are in the range of
-cross-validated results reported on the CinC 2017 training data. They are slightly below the best scores on the challenge's
-hidden test set (≈ 0.83 [Clifford 2017] *[verify]*), which were obtained with larger ensembles and are not directly comparable to a
-single 20% hold-out. The binary AF results agree with the literature in that RR-irregularity and P-wave features carry most of
-the information (COSEn, pNN50 and the P-region correlation ranked highest). The external results show that features designed on
-handheld recordings transfer to clinical lead I. To our knowledge, real-noise evaluations of single-lead AF classifiers
+**Comparison with prior work.** On the CinC 2017 data, Andreotti et al. found that a feature-based classifier and a CNN
+reached similar cross-validated scores (72.0% and 72.1%) [Andreotti 2017], which matches the near-identical clean
+performance of our feature-based models and CNN. Our four-class challenge scores (0.80 for the CNN and gradient boosting)
+are slightly below the best scores on the challenge's hidden test set (0.83, a four-way tie [Clifford 2017]); those were
+measured on a different test set and are not directly comparable to a single 20% hold-out. The binary AF results agree
+with the literature in that RR-irregularity and P-wave features carry most of the information (COSEn, pNN50 and the
+P-region correlation ranked highest), and the external results show that features designed on handheld recordings transfer
+to clinical lead I. Our augmentation results agree with Venton et al., who found that training on noisy ECGs limited the
+loss of CNN performance under noise [Venton 2021]. To our knowledge, real-noise evaluations of single-lead AF classifiers
 that compare feature-based and end-to-end models, report the direction of errors, and test augmentation and abstention in one
-paired design are rare. *[Add a brief literature search and 2–4 citations of prior robustness work here before submission.]*
+paired design are rare.
 
 ### Limitations
 1. The public CinC 2017 data have no patient identifiers. Splits and cross-validation are therefore at the recording level,
@@ -391,14 +399,16 @@ original approval.]
 **Author contributions (CRediT).** Tejas Menneni: Conceptualization, Methodology, Software, Formal analysis,
 Investigation, Data curation, Visualization, Writing – original draft, Writing – review & editing.
 
-**Declaration of generative AI use.** During the preparation of this work the author used Claude (Anthropic) to assist with
-writing analysis code and drafting the manuscript. The author reviewed and edited all code and text and takes full
-responsibility for the content of the publication. [Required by Elsevier journals; edit to describe your actual use.]
+**Declaration of generative AI use.** During the preparation of this work the author used the Anaconda Prompt AI
+assistant and Claude (Anthropic) to help write the analysis code and draft the manuscript. The author reviewed and edited
+all code and text and takes full responsibility for the content of the publication.
 
 ## References
 *(Verify every entry against the original before submission; complete page ranges and DOIs.)*
 
-- [Clifford 2017] Clifford GD, Liu C, Moody B, et al. AF classification from a short single lead ECG recording: the PhysioNet/Computing in Cardiology Challenge 2017. *Computing in Cardiology* 2017;44.
+- [Andreotti 2017] Andreotti F, Carr O, Pimentel MAF, Mahdi A, De Vos M. Comparing feature-based classifiers and convolutional neural networks to detect arrhythmia from short segments of ECG. *Computing in Cardiology* 2017;44.
+- [Behar 2013] Behar J, Oster J, Li Q, Clifford GD. ECG signal quality during arrhythmia and its application to false alarm reduction. *IEEE Trans Biomed Eng* 2013;60(6):1660–1666. doi:10.1109/TBME.2013.2240452.
+- [Clifford 2017] Clifford GD, Liu C, Moody B, et al. AF classification from a short single lead ECG recording: the PhysioNet/Computing in Cardiology Challenge 2017. *Computing in Cardiology* 2017;44. doi:10.22489/CinC.2017.065-469.
 - [Collins 2024] Collins GS, Moons KGM, Dhiman P, et al. TRIPOD+AI statement: updated guidance for reporting clinical prediction models that use regression or machine learning methods. *BMJ* 2024;385:e078378.
 - [Ke 2017] Ke G, Meng Q, Finley T, et al. LightGBM: a highly efficient gradient boosting decision tree. *Advances in Neural Information Processing Systems* 30, 2017.
 - [Lake 2011] Lake DE, Moorman JR. Accurate estimation of entropy in very short physiological time series: the problem of atrial fibrillation detection in implanted ventricular devices. *Am J Physiol Heart Circ Physiol* 2011;300:H319–H325.
@@ -406,12 +416,14 @@ responsibility for the content of the publication. [Required by Elsevier journal
 - [Lipponen 2019] Lipponen JA, Tarvainen MP. A robust algorithm for heart rate variability time series artefact correction using novel beat classification. *J Med Eng Technol* 2019;43:173–181.
 - [Lundberg 2017] Lundberg SM, Lee S-I. A unified approach to interpreting model predictions. *Advances in Neural Information Processing Systems* 30, 2017.
 - [Makowski 2021] Makowski D, Pham T, Lau ZJ, et al. NeuroKit2: a Python toolbox for neurophysiological signal processing. *Behav Res Methods* 2021;53:1689–1696.
+- [Mannhart 2023] Mannhart D, et al. Clinical validation of 5 direct-to-consumer wearable smart devices to detect atrial fibrillation: BASEL Wearable Study. *JACC Clin Electrophysiol* 2023;9(2):232–242. doi:10.1016/j.jacep.2022.09.011.
 - [Moody 1984] Moody GB, Muldrow WE, Mark RG. A noise stress test for arrhythmia detectors. *Computers in Cardiology* 1984;11:381–384.
 - [Perez 2019] Perez MV, Mahaffey KW, Hedlin H, et al. Large-scale assessment of a smartwatch to identify atrial fibrillation. *N Engl J Med* 2019;381:1909–1917.
 - [Platt 1999] Platt J. Probabilistic outputs for support vector machines and comparisons to regularized likelihood methods. In: *Advances in Large Margin Classifiers*. MIT Press; 1999.
 - [Richman 2000] Richman JS, Moorman JR. Physiological time-series analysis using approximate entropy and sample entropy. *Am J Physiol Heart Circ Physiol* 2000;278:H2039–H2049.
+- [Venton 2021] Venton J, Harris PM, Sundar A, Smith NAS, Aston PJ. Robustness of convolutional neural networks to physiological electrocardiogram noise. *Phil Trans R Soc A* 2021;379(2212):20200262. doi:10.1098/rsta.2020.0262.
 - [Wagner 2020] Wagner P, Strodthoff N, Bousseljot R-D, et al. PTB-XL, a large publicly available electrocardiography dataset. *Sci Data* 2020;7:154.
-- [Zhao 2018] Zhao Z, Zhang Y. SQI quality evaluation mechanism of single-lead ECG signal based on simple heuristic fusion and fuzzy comprehensive evaluation. *Front Physiol* 2018;9:727. *[verify]*
+- [Zhao 2018] Zhao Z, Zhang Y. SQI quality evaluation mechanism of single-lead ECG signal based on simple heuristic fusion and fuzzy comprehensive evaluation. *Front Physiol* 2018;9:727. doi:10.3389/fphys.2018.00727.
 
 ## Tables
 
@@ -492,3 +504,5 @@ GB, gradient boosting. Without abstention (internal, EM −6 dB): GB AUROC 0.884
 **Figure 5.** Reliability curves (seed-averaged probabilities, equal-mass bins) for gradient boosting and the CNN, clean versus electrode motion at 12 and 0 dB. (`fig5_calibration.png`)
 
 **Figure 6.** (a) Gradient-boosting feature importance (share of mean |SHAP|) on clean data. (b) Importance across electrode-motion SNR levels. (`fig6_shap.png`)
+
+**Supplementary Figure S1.** Participant flow: CinC 2017 split into development and locked internal test sets, exclusion of the noisy class for the binary task, PTB-XL external test set, and the separate training and test partitions of the MIT-BIH Noise Stress Test Database. (`fig0_flow.png`)
