@@ -2,7 +2,7 @@
   "title": "ecgrobust: a framework for evaluating wearable ECG classifiers under real-world noise",
   "upload_type": "software",
   "description": "Code for the study evaluating how single-lead AF classifiers (rule-based, logistic regression, gradient boosting, 1-D CNN) degrade under real recorded noise from the MIT-BIH Noise Stress Test Database, with external validation on PTB-XL lead I, noise augmentation, and quality-based abstention.",
-  "license": "MIT",
+  "license": "mit",
   "keywords": ["ECG", "atrial fibrillation", "wearables", "robustness", "noise", "external validation", "TRIPOD+AI"],
   "creators": [{"name": "Menneni, Tejas", "affiliation": "Columbus State Community College"}]
 }
