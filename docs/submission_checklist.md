@@ -12,8 +12,8 @@
 - [ ] Re-read the limitations (9 items) and keep all of them.
 
 ## Code release (needed for the DOI cited in the paper)
-- [ ] Create a public GitHub repository and push this project (raw data, features and model files are excluded by `.gitignore`;
-      results tables, figures, the split and the test-lock audit trail are included).
+- [x] Public GitHub repository created and pushed: https://github.com/TSFIRE99-bot/wearable-ecg-noise-stress-test
+      (raw data, features and model files are excluded; results tables, figures, the split and the test-lock audit trail are included).
 - [ ] Tag a release (e.g. `v1.0.0`) and connect the repository to Zenodo to mint a DOI; put the DOI into the manuscript,
       README and `CITATION.cff`.
 - [ ] Optionally archive the 51 frozen model files (`outputs/models/`, about 110 MB) on Zenodo alongside the code.
