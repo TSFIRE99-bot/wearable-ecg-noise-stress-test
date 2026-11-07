@@ -14,3 +14,6 @@ outputs*/*
 !outputs/TEST_SET_UNLOCKED.json
 !outputs/environment_*.json
 paper/archive/
+
+# manuscript kept local until the medRxiv preprint is posted
+paper/

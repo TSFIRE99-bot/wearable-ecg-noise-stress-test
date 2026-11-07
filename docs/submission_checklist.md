@@ -31,7 +31,7 @@
 | Fig. 4 | `outputs/figures/fig4_abstention.png` |
 | Fig. 5 | `outputs/figures/fig5_calibration.png` |
 | Fig. 6 | `outputs/figures/fig6_shap.png` |
-| Suppl. S1 | `fourclass_challenge.csv` · S2 `subgroups_external.csv` · S3 `paired_tests.csv`, `augmentation_effect.csv` · S4 TRIPOD+AI (`docs/TRIPOD_AI_checklist.md`) |
+| Supplement (separate file) | `paper/submission/supplementary.pdf`: Fig. S1 flow diagram, Table S1 four-class scores, Table S2 external subgroups, Table S3 TRIPOD+AI mapping |
 
 ## medRxiv specifics
 - Subject area: Cardiovascular Medicine (or Health Informatics).
