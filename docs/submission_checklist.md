@@ -14,8 +14,7 @@
 ## Code release (needed for the DOI cited in the paper)
 - [x] Public GitHub repository created and pushed: https://github.com/TSFIRE99-bot/wearable-ecg-noise-stress-test
       (raw data, features and model files are excluded; results tables, figures, the split and the test-lock audit trail are included).
-- [ ] Tag a release (e.g. `v1.0.0`) and connect the repository to Zenodo to mint a DOI; put the DOI into the manuscript,
-      README and `CITATION.cff`.
+- [x] Zenodo DOI minted for release v1.0.2: 10.5281/zenodo.24042753 (all versions: 10.5281/zenodo.24042752); added to the manuscript, README and `CITATION.cff`.
 - [ ] Optionally archive the 51 frozen model files (`outputs/models/`, about 110 MB) on Zenodo alongside the code.
 
 ## Figures and tables for the manuscript

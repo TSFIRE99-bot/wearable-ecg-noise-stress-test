@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite the accompanying article and this archive."
 title: "ecgrobust: a framework for evaluating wearable ECG classifiers under real-world noise"
-version: 0.1.0
-date-released: 2026-11-05
+version: 1.0.2
+date-released: 2026-11-07
 license: MIT
 authors:
   - family-names: "Menneni"
@@ -10,7 +10,7 @@ authors:
     affiliation: "Columbus State Community College"
     # orcid: "https://orcid.org/XXXX-XXXX-XXXX-XXXX"   <- add if you create one (free at orcid.org)
 repository-code: "https://github.com/TSFIRE99-bot/wearable-ecg-noise-stress-test"
-# doi: 10.5281/zenodo.XXXXXXX   <- fill in after the first Zenodo release
+doi: 10.5281/zenodo.24042752   # Zenodo concept DOI (all versions); v1.0.2 is 10.5281/zenodo.24042753
 references:
   - type: dataset
     title: "AF Classification from a Short Single Lead ECG Recording: The PhysioNet/Computing in Cardiology Challenge 2017"
