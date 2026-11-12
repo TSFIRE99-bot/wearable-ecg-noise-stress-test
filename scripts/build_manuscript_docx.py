@@ -178,11 +178,13 @@ while i < len(lines):
     if in_legends and s.startswith("**") and "Figure" in s:   # legend: embed the figure first
         flush()
         fm = re.search(r"`(fig[^`]+\.png)`", s)
-        if fm and (FIG / fm.group(1)).exists():
+        # journal figures (figureN.png) live in paper/submission; others in outputs/figures
+        src = next((d / fm.group(1) for d in (OUT.parent, FIG) if fm and (d / fm.group(1)).exists()), None)
+        if src is not None:
             doc.add_page_break()
             pic = doc.add_paragraph(); pic.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            width = 6.0 if "flow" in fm.group(1) else 6.5
-            pic.add_run().add_picture(str(FIG / fm.group(1)), width=Inches(width))
+            width = 6.0 if "flow" in fm.group(1) else 15 / 2.54   # journal figures are 15 cm wide
+            pic.add_run().add_picture(str(src), width=Inches(width))
         add_runs(doc.add_paragraph(), strip_pointers(s))
         i += 1; continue
     buf.append(ln); i += 1
