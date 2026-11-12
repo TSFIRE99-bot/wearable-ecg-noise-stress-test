@@ -9,6 +9,7 @@ Table S1 (four-class challenge scores), Table S2 (external subgroups) and Table 
 from __future__ import annotations
 
 import re
+import sys
 from pathlib import Path
 
 import pandas as pd
@@ -21,6 +22,9 @@ from docx.shared import Inches, Pt, RGBColor
 ROOT = Path(__file__).resolve().parents[1]
 TAB, FIG = ROOT / "outputs" / "tables", ROOT / "outputs" / "figures"
 OUT = ROOT / "paper" / "submission" / "supplementary.docx"
+NO_FIGURES = "--no-figures" in sys.argv   # leave a labelled placeholder for Figure S1
+if NO_FIGURES:
+    OUT = OUT.with_name("supplementary_no_figures.docx")
 TITLE = "Stress-testing wearable ECG atrial fibrillation classifiers with real recorded noise"
 FONT = "Calibri"
 ci = lambda s: re.sub(r" \(±[0-9.]+\)", "", str(s))  # noqa: E731  (drop the seed SD; keep mean [95% CI])
@@ -66,7 +70,13 @@ doc.add_paragraph("Code and all result tables: https://github.com/TSFIRE99-bot/w
 # Figure S1
 doc.add_heading("Supplementary Figure S1", level=1)
 pic = doc.add_paragraph(); pic.alignment = WD_ALIGN_PARAGRAPH.CENTER
-pic.add_run().add_picture(str(FIG / "fig0_flow.png"), width=Inches(6.0))
+journal_s1 = OUT.parent / "figureS1.png"   # journal-format version from make_journal_figures.py
+if NO_FIGURES:
+    pic.add_run("[Insert Supplementary Figure S1 here: figureS1.png, 15 cm wide]").bold = True
+elif journal_s1.exists():
+    pic.add_run().add_picture(str(journal_s1), width=Inches(15 / 2.54))
+else:
+    pic.add_run().add_picture(str(FIG / "fig0_flow.png"), width=Inches(6.0))
 caption("Supplementary Figure S1.", "Participant flow: CinC 2017 split into development and locked internal test sets, "
         "exclusion of the noisy class for the binary task, the PTB-XL external test set, and the separate training and "
         "test partitions of the MIT-BIH Noise Stress Test Database.")

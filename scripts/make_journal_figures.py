@@ -2,7 +2,7 @@
 
     python scripts/make_journal_figures.py --config configs/local.yaml
 
-Writes paper/submission/figure1.pdf/.png ... figure6.pdf/.png. Data, colours, markers and
+Writes paper/submission/figure1.pdf/.png ... figure6.pdf/.png and figureS1.pdf/.png (supplementary flow diagram). Data, colours, markers and
 the content of each figure match the report figures (src/ecgrobust/report.py); only size,
 fonts, panel labels and legend placement change, plus Figure 4's right panel, which now
 shows electrode motion at -6 dB instead of +6 dB.
@@ -33,6 +33,9 @@ sys.path.insert(0, str(ROOT / "src"))
 from ecgrobust.metrics import calibration_summary  # noqa: E402
 from ecgrobust.noise import Condition  # noqa: E402
 from ecgrobust.utils import Paths, load_config  # noqa: E402
+
+sys.path.insert(0, str(ROOT / "scripts"))
+from make_flow_diagram import draw_flow  # noqa: E402
 
 # same palette, markers and labels as src/ecgrobust/report.py
 MODELS = ["rule", "logreg", "lgbm", "cnn"]
@@ -260,6 +263,13 @@ def fig6(w, h):
     return fig
 
 
+def figS1(w, h):
+    """Supplementary Figure S1: participant flow diagram (same counts as scripts/make_flow_diagram.py)."""
+    fig = draw_flow(r.paths.root, width=w, height=h, title_pt=9, body_pt=8, note_pt=8)
+    fig.subplots_adjust(0, 0, 1, 1)
+    return fig
+
+
 # calibration curves come from the saved predictions (same computation as the report)
 cal_curves = {}
 for m in ("lgbm", "cnn"):
@@ -298,6 +308,7 @@ def export(name: str, draw, target_w: float, height: float, fit: str = "width"):
 
 for name, draw, h, fit in [("figure1", fig1, 2.45, "width"), ("figure2", fig2, 2.5, "width"),
                            ("figure3", fig3, 2.6, "width"), ("figure4", fig4, 2.5, "width"),
-                           ("figure5", fig5, 3.0, "width"), ("figure6", fig6, 3.6, "width")]:
+                           ("figure5", fig5, 3.0, "width"), ("figure6", fig6, 3.6, "width"),
+                           ("figureS1", figS1, 5.6, "width")]:
     export(name, draw, MULTI_W, h, fit)
     print(f"wrote {OUT / name}.pdf and .png")

@@ -9,6 +9,7 @@ reminder. Figures are embedded above their legends.
 from __future__ import annotations
 
 import re
+import sys
 from pathlib import Path
 
 from docx import Document
@@ -23,6 +24,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "paper" / "manuscript.md"
 FIG = ROOT / "outputs" / "figures"
 OUT = ROOT / "paper" / "submission" / "manuscript.docx"
+NO_FIGURES = "--no-figures" in sys.argv   # leave a labelled placeholder where each figure goes
+if NO_FIGURES:
+    OUT = OUT.with_name("manuscript_no_figures.docx")
 FONT = "Calibri"
 
 
@@ -180,7 +184,12 @@ while i < len(lines):
         fm = re.search(r"`(fig[^`]+\.png)`", s)
         # journal figures (figureN.png) live in paper/submission; others in outputs/figures
         src = next((d / fm.group(1) for d in (OUT.parent, FIG) if fm and (d / fm.group(1)).exists()), None)
-        if src is not None:
+        label = re.match(r"\*\*((?:Supplementary )?Figure S?\d+)\.", s)
+        if NO_FIGURES and fm:
+            doc.add_page_break()
+            ph = doc.add_paragraph(); ph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            ph.add_run(f"[Insert {label.group(1) if label else 'figure'} here: {fm.group(1)}, 15 cm wide]").bold = True
+        elif src is not None:
             doc.add_page_break()
             pic = doc.add_paragraph(); pic.alignment = WD_ALIGN_PARAGRAPH.CENTER
             width = 6.0 if "flow" in fm.group(1) else 15 / 2.54   # journal figures are 15 cm wide
