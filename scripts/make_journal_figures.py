@@ -2,14 +2,13 @@
 
     python scripts/make_journal_figures.py --config configs/local.yaml
 
-Writes paper/submission/figure1.pdf/.png ... figure6.pdf/.png and figureS1.pdf/.png (supplementary flow diagram). Data, colours, markers and
-the content of each figure match the report figures (src/ecgrobust/report.py); only size,
-fonts, panel labels and legend placement change, plus Figure 4's right panel, which now
-shows electrode motion at -6 dB instead of +6 dB.
+Writes paper/submission/figure1.pdf/.png ... figure6.pdf/.png and figureS1.pdf/.png
+(supplementary flow diagram). Data, colours and markers are the same as the report figures
+in src/ecgrobust/report.py. Figure 4(b) shows electrode motion at -6 dB.
 
-Format: multi-panel width 15 cm (all six figures have two or three panels), Arial,
-8 pt ticks and legends, 9 pt axis labels and panel titles, fonts embedded (TrueType),
-vector PDF plus 600 dpi PNG, saved with bbox_inches="tight" on a white background.
+Format: 15 cm wide (every figure has two or three panels), Arial, 8 pt ticks and legends,
+9 pt axis labels and panel titles, TrueType fonts embedded, vector PDF plus 600 dpi PNG,
+saved with bbox_inches="tight" on a white background.
 """
 from __future__ import annotations
 
@@ -77,7 +76,7 @@ OUT = ROOT / "paper" / "submission"
 OUT.mkdir(parents=True, exist_ok=True)
 
 
-# ----------------------------------------------------------------------------- data (unchanged)
+# ----------------------------------------------------------------------------- data
 class Saved:
     """The parts of the report's state the figures need, read from the saved files."""
 
@@ -167,7 +166,8 @@ def fig2(w, h):
         a2.scatter(xs, d.auroc, color=COLOR[m], marker=MARKER[m], s=16, label=LABEL[m], edgecolor="white", linewidth=0.6)
     a2.set_xlabel("R-peak detection F1 in that condition")
     a2.set_ylabel("AUROC")
-    a2.legend(loc="lower right", frameon=False)
+    # legend below panel (b); inside the panel it covers the rule points near F1 0.93-0.94
+    a2.legend(loc="upper center", bbox_to_anchor=(0.5, -0.22), ncol=2, frameon=False)
     a2.set_title("(b)")
     return fig
 
