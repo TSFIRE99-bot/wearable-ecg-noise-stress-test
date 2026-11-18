@@ -97,7 +97,7 @@ p = doc.add_paragraph(); p.add_run("Supplementary material for: ").bold = True; 
 if not ANONYMOUS:
     doc.add_paragraph("Tejas Menneni, Columbus State Community College, Columbus, OH, USA (tejas.menneni@gmail.com)")
     doc.add_paragraph("Code and all result tables: https://github.com/TSFIRE99-bot/wearable-ecg-noise-stress-test "
-                      "(archived at https://doi.org/10.5281/zenodo.24042753).")
+                      "(release v1.0.3, archived at https://doi.org/10.5281/zenodo.24352330).")
 
 # Figure S1
 doc.add_heading("Supplementary figure S1", level=1).paragraph_format.page_break_before = True

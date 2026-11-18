@@ -37,7 +37,7 @@ AUTHOR = "Tejas Menneni"
 # Identifying details removed from the anonymous version.
 ANON_SUBS = [
     (r"https://github\.com/TSFIRE99-bot/wearable-ecg-noise-stress-test", "[repository link withheld for anonymous review]"),
-    (r"https://doi\.org/10\.5281/zenodo\.24042753", "[archive DOI withheld for anonymous review]"),
+    (r"https://doi\.org/10\.5281/zenodo\.\d+", "[archive DOI withheld for anonymous review]"),
     (AUTHOR, "[author name withheld for anonymous review]"),
 ]
 
