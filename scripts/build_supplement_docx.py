@@ -2,12 +2,13 @@
 
     python scripts/build_supplement_docx.py                 # named version
     python scripts/build_supplement_docx.py --anonymous     # double-anonymous review version
-    python scripts/build_supplement_docx.py --no-figures    # placeholder instead of figure S1
+    python scripts/build_supplement_docx.py --no-figures    # placeholders instead of the figures
 
-Writes paper/submission/physiol_meas/supplementary[_anonymous][_no_figures].docx with supplementary
-figure S1 (flow of recordings), table S1 (four-class challenge scores), table S2 (external
-subgroups) and table S3 (TRIPOD+AI mapping), built from outputs/ and docs/. IOP asks for a
-title (30 characters or fewer) and a description (30 words or fewer) inside the file.
+Writes paper/submission/physiol_meas/supplementary[_anonymous][_no_figures].docx with the supplementary
+methods (paper/supplement_methods.md), figure S1 (flow of recordings), tables S1-S3 built from outputs/ and
+docs/ (four-class scores, external subgroups, TRIPOD+AI mapping), and the tables and figures moved out of the
+main text (paper/supplement_items.md: tables S4-S7, figures S2-S4). IOP asks for a title (30 characters or
+fewer) and a description (30 words or fewer) inside the file.
 """
 from __future__ import annotations
 
@@ -29,9 +30,9 @@ ANONYMOUS = "--anonymous" in sys.argv
 OUT = ROOT / "paper" / "submission" / "physiol_meas" / ("supplementary" + ("_anonymous" if ANONYMOUS else "")
                                        + ("_no_figures" if NO_FIGURES else "") + ".docx")
 TITLE = "Stress-testing wearable ECG atrial fibrillation classifiers with real recorded noise"
-SUPP_TITLE = "Study flow and extra tables"    # 27 characters
-SUPP_DESCRIPTION = ("Flow of recordings (figure S1), four-class challenge scores (table S1), external performance "
-                    "by sex and age (table S2) and the TRIPOD+AI reporting checklist mapping (table S3).")
+SUPP_TITLE = "Extended methods and results"    # 28 characters
+SUPP_DESCRIPTION = ("Extended methods, flow of recordings, four-class scores, external subgroups, TRIPOD+AI mapping, "
+                    "cohort table, full noise and abstention results, calibration and feature importance under noise.")
 assert len(SUPP_TITLE) <= 30 and len(SUPP_DESCRIPTION.split()) <= 30
 FONT = "Times New Roman"
 ci = lambda s: re.sub(r" \(±[0-9.]+\)", "", str(s))  # noqa: E731  (drop the seed SD; keep mean [95% CI])
@@ -49,7 +50,7 @@ st = doc.styles["Normal"]
 st.font.name, st.font.size = FONT, Pt(12)
 st.element.rPr.rFonts.set(qn("w:eastAsia"), FONT)
 st.paragraph_format.line_spacing = 1.5
-for name, size in [("Title", 15), ("Heading 1", 13)]:
+for name, size in [("Title", 15), ("Heading 1", 13), ("Heading 2", 12)]:
     s = doc.styles[name]
     s.font.name, s.font.size, s.font.bold = FONT, Pt(size), True
     s.font.color.rgb = RGBColor(0, 0, 0)
@@ -91,6 +92,88 @@ def note(text: str):
     p.add_run(text).font.size = Pt(10)
 
 
+INLINE = re.compile(r"(\*\*[^*]+\*\*|\*[^*\s][^*]*\*|<sub>[^<]+</sub>)")
+
+
+def runs(par, text: str, size: float | None = None):
+    for tok in INLINE.split(text):
+        if not tok:
+            continue
+        if tok.startswith("**"):
+            r = par.add_run(tok[2:-2]); r.bold = True
+        elif tok.startswith("<sub>"):
+            r = par.add_run(tok[5:-6]); r.font.subscript = True
+        elif tok.startswith("*") and len(tok) > 2:
+            r = par.add_run(tok[1:-1]); r.italic = True
+        else:
+            r = par.add_run(tok)
+        if size:
+            r.font.size = Pt(size)
+
+
+def render_md(path: Path):
+    """Render a small markdown file: ## (new page) and ### headings, paragraphs, lists, tables, figures.
+
+    A paragraph that starts with **Table** is a caption above its table, one that starts with **Figure** a caption
+    below its figure, and the paragraph right after a table is that table's note."""
+    lines, i, buf, after_table = path.read_text(encoding="utf-8").splitlines(), 0, [], False
+
+    def flush():
+        nonlocal buf, after_table
+        if not buf:
+            return
+        text = " ".join(s.strip() for s in buf)
+        m = re.match(r"\*\*((?:Table|Figure) S\d+\.)\*\* (.*)", text)
+        if m:
+            caption(m.group(1), m.group(2), above=m.group(1).startswith("Table"))
+        elif after_table:
+            note(text)
+        else:
+            runs(doc.add_paragraph(), text)
+        buf, after_table = [], False
+
+    while i < len(lines):
+        ln, s = lines[i], lines[i].strip()
+        if not s:
+            flush(); i += 1; continue
+        if ln.startswith("## "):
+            flush(); doc.add_heading(ln[3:].strip(), level=1).paragraph_format.page_break_before = True; i += 1; continue
+        if ln.startswith("### "):
+            flush(); doc.add_heading(ln[4:].strip(), level=2); i += 1; continue
+        fm = re.match(r"!\[[^\]]*\]\(([^)]+)\)", s)
+        if fm:
+            flush()
+            pic = doc.add_paragraph(); pic.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            pic.paragraph_format.keep_with_next, pic.paragraph_format.line_spacing = True, 1.0
+            if NO_FIGURES:
+                pic.add_run(f"[Insert {fm.group(1)} here, 15 cm wide]").bold = True
+            else:
+                pic.add_run().add_picture(str(ROOT / "paper" / "submission" / fm.group(1)), width=Inches(15 / 2.54))
+            i += 1; continue
+        if s.startswith("|"):
+            flush()
+            rows = []
+            while i < len(lines) and lines[i].strip().startswith("|"):
+                cells = [c.strip() for c in lines[i].strip().strip("|").split("|")]
+                if not all(re.fullmatch(r":?-{3,}:?", c) for c in cells):
+                    rows.append(cells)
+                i += 1
+            table(pd.DataFrame(rows[1:], columns=rows[0]), size=8 if len(rows[0]) <= 7 else 7.5)
+            after_table = True
+            continue
+        if s.startswith("- "):
+            flush()
+            text = s[2:]; i += 1
+            while i < len(lines) and lines[i].startswith("  ") and lines[i].strip():
+                text += " " + lines[i].strip(); i += 1
+            p = doc.add_paragraph(); p.paragraph_format.left_indent = Inches(0.3)
+            p.paragraph_format.first_line_indent = Inches(-0.3); p.paragraph_format.line_spacing = 1.15
+            runs(p, text, size=11)
+            continue
+        buf.append(ln); i += 1
+    flush()
+
+
 doc.add_paragraph(SUPP_TITLE, style="Title")
 p = doc.add_paragraph(); p.add_run("Description: ").bold = True; p.add_run(SUPP_DESCRIPTION)
 p = doc.add_paragraph(); p.add_run("Supplementary material for: ").bold = True; p.add_run(TITLE)
@@ -98,6 +181,8 @@ if not ANONYMOUS:
     doc.add_paragraph("Tejas Menneni, Columbus State Community College, Columbus, OH, USA (tejas.menneni@gmail.com)")
     doc.add_paragraph("Code and all result tables: https://github.com/TSFIRE99-bot/wearable-ecg-noise-stress-test "
                       "(release v1.0.3, archived at https://doi.org/10.5281/zenodo.24352330).")
+
+render_md(ROOT / "paper" / "supplement_methods.md")
 
 # Figure S1
 doc.add_heading("Supplementary figure S1", level=1).paragraph_format.page_break_before = True
@@ -161,6 +246,8 @@ tr = pd.DataFrame(rows[1:], columns=rows[0])
 caption("Table S3.", "Where the manuscript addresses each topic of the TRIPOD+AI reporting guideline (Collins et al "
         "2024). Topic names are paraphrased; file names refer to the public code repository.")
 table(tr, size=7.5)
+
+render_md(ROOT / "paper" / "supplement_items.md")
 
 OUT.parent.mkdir(parents=True, exist_ok=True)
 doc.save(OUT)

@@ -18,7 +18,7 @@ page numbers.
 | | Data preparation, pre-processing | `features.py` docstring; resampling in `data.py` |
 | Outcome | Definition and how assessed | CinC: expert-reviewed v3 labels; PTB-XL: SCP code `AFIB` (cardiologist annotation) |
 | | Blinding of outcome assessment | Labels were made independently of this study |
-| Predictors | Definition, timing, measurement | Feature list in `features.py`; raw signal for CNN |
+| Predictors | Definition, timing, measurement | Supplementary methods (feature list; `features.py`); raw signal for CNN |
 | | Predictor assessment blind to outcome | Feature extraction never reads labels (`run_features`) |
 | Sample size | Justification | Fixed public datasets: report events per split (`splits.json`), events per feature, and CI widths |
 | Missing data | Handling | Features undefined when < 5 beats: median imputation + missingness indicators (LR), native NaN handling (LightGBM), median fill (rule) |
@@ -26,7 +26,7 @@ page numbers.
 | | Model output (probabilities, thresholds) | Platt-calibrated probability; max-F1 threshold from out-of-fold training predictions |
 | | Performance measures | Sensitivity, specificity, PPV, NPV, F1, AUROC, AUPRC, Brier, ECE, calibration slope/intercept |
 | | Uncertainty | 5 seeds (SD) + 1,000 bootstrap replicates; patient-cluster bootstrap for PTB-XL; paired tests, Holm |
-| Class imbalance | Methods used and their effect on calibration | Class weights; Platt recalibration; calibration reported (`calibration.csv`, Fig 5) |
+| Class imbalance | Methods used and their effect on calibration | Class weights; Platt recalibration; calibration reported (`calibration.csv`, supplementary figure S3) |
 | Fairness | Methods to assess | External performance by sex and age band, patient-level bootstrap (`subgroups_external.csv`); no demographics in CinC 2017 |
 | Training vs evaluation | Differences in data between development and evaluation | Device, lead, duration (9–60 s vs 10 s), population; discussed |
 | Ethics | Approval | Secondary analysis of de-identified public data; cite each dataset's original ethics statement |
@@ -34,11 +34,11 @@ page numbers.
 | | Data sharing | Data availability statement (README) |
 | | Code sharing | GitHub + Zenodo DOI; fixed seeds; `requirements.txt` |
 | Patient involvement | PPI | State "none" if none |
-| Results | Participant flow and characteristics | Table 1 (`table1_cohorts.csv`): counts, AF prevalence, PTB-XL age/sex. flow diagram in Supplementary Fig. S1 (`fig0_flow.png`, made by `scripts/make_flow_diagram.py`) |
+| Results | Participant flow and characteristics | Supplementary table S4 (`table1_cohorts.csv`): counts, AF prevalence, PTB-XL age/sex; flow diagram in supplementary figure S1 (`fig0_flow.png`, made by `scripts/make_flow_diagram.py`) |
 | | Model development details | `best_params` in each bundle; CV scores |
 | | Full model specification | Code + archived model files |
 | | Performance with CIs, internal and external | `main_internal.csv`, `main_external.csv` |
 | | Model updating | Augmentation analysis (`augmentation_effect.csv`) |
 | Discussion | Interpretation, including fairness | Discussion |
-| | Limitations | `paper/manuscript.md`, Discussion: Limitations (9 items) |
+| | Limitations | Discussion, section 4.1 (Limitations) |
 | | Usability, implementation | Abstention operating points (`abstention_fixed_threshold.csv`) |

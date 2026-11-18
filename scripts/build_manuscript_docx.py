@@ -79,6 +79,14 @@ sec = doc.sections[0]
 sec.page_width, sec.page_height = Inches(8.5), Inches(11)
 for side in ("left_margin", "right_margin", "top_margin", "bottom_margin"):
     setattr(sec, side, Inches(1))
+# continuous line numbers in the margin, so reviewers can refer to lines
+ln_num = OxmlElement("w:lnNumType")
+ln_num.set(qn("w:countBy"), "1"); ln_num.set(qn("w:restart"), "continuous"); ln_num.set(qn("w:distance"), "283")
+cols = sec._sectPr.find(qn("w:cols"))
+if cols is not None:
+    cols.addprevious(ln_num)
+else:
+    sec._sectPr.append(ln_num)
 
 st = doc.styles["Normal"]
 st.font.name, st.font.size = FONT, Pt(12)
@@ -119,16 +127,65 @@ for tag, txt in [("begin", None), (None, "PAGE"), ("end", None)]:
     run._r.append(el)
 
 
+TEXT_WIDTH = 6.5   # inches between the 1 in margins of a Letter page
+CELL_PAD = 0.16    # inches of left + right cell margin in Word's Table Grid style
+
+
+def _text_inches(text: str, size: float, bold: bool = False) -> float:
+    """Printed width of text in Times New Roman, measured from the installed font (fallback: estimate)."""
+    try:
+        from PIL import ImageFont
+        font = ImageFont.truetype("timesbd.ttf" if bold else "times.ttf", 100)
+        return font.getlength(text) * size / 100 / 72
+    except Exception:
+        return len(text) * size * 0.45 / 72
+
+
+def column_widths(rows: list[list[str]], size: float) -> list[float] | None:
+    """Give each column the width of its longest cell (headers may wrap between words). If the table is too wide,
+    columns of numbers keep their full width and only the text columns wrap. None if even that does not fit."""
+    plain = lambda s: re.sub(r"\*\*|`|<sub>|</sub>", "", s.strip())  # noqa: E731
+    ncol = len(rows[0])
+    need, floor, numeric = [], [], []
+    for j in range(ncol):
+        body = [plain(r[j]) for r in rows[1:]]
+        head = plain(rows[0][j])
+        w_body = max((_text_inches(s, size) for s in body), default=0)
+        w_head = max((_text_inches(w, size, True) for w in head.split()), default=0)
+        need.append(max(w_body, w_head) + CELL_PAD)
+        short = max((len(s) for s in body), default=0) <= 12   # short labels such as "EM −6 dB" never wrap
+        floor.append(need[-1] if short else
+                     max([_text_inches(w, size) for s in body for w in s.split()] + [w_head]) + CELL_PAD)
+        numeric.append(sum(ch.isdigit() for s in body for ch in s) > 0.4 * max(1, sum(len(s) for s in body)))
+    if sum(need) <= TEXT_WIDTH:
+        return [w * TEXT_WIDTH / sum(need) for w in need]
+    fixed = sum(n for n, num in zip(need, numeric) if num)
+    rest = TEXT_WIDTH - fixed
+    text_need = sum(n for n, num in zip(need, numeric) if not num)
+    widths = [n if num else max(f, n * rest / text_need) if text_need else n
+              for n, f, num in zip(need, floor, numeric)]
+    return widths if sum(widths) <= TEXT_WIDTH + 1e-6 else None
+
+
 def add_table(rows: list[list[str]]):
-    """Black-and-white grid table; cell text is single spaced and smaller than body text."""
+    """Black-and-white grid table; cell text is single spaced and smaller than body text. Columns are sized to their
+    contents so that numbers with confidence intervals stay on one line where possible."""
     ncol = len(rows[0])
     t = doc.add_table(rows=len(rows), cols=ncol)
     t.style = "Table Grid"
     t.alignment = WD_TABLE_ALIGNMENT.CENTER
-    size = 9 if ncol <= 5 else 8 if ncol <= 7 else 7.5
+    t.autofit = False
+    size, widths = 9.0, None
+    while widths is None and size >= 7:
+        widths = column_widths(rows, size)
+        if widths is None:
+            size -= 0.5
+    if widths is None:   # nothing fits: equal columns at the smallest size, cells wrap
+        size, widths = 7.0, [TEXT_WIDTH / ncol] * ncol
     for i, row in enumerate(rows):
         for j, cell in enumerate(row):
             c = t.cell(i, j)
+            c.width = Inches(widths[j])
             c.text = ""
             p = c.paragraphs[0]
             p.paragraph_format.space_after = Pt(0)
@@ -234,6 +291,8 @@ while i < len(lines):
         p.paragraph_format.left_indent, p.paragraph_format.first_line_indent = Inches(0.3), Inches(-0.3)
         if not refs:
             p.paragraph_format.tab_stops.add_tab_stop(Inches(0.3))
+        else:   # the reference list is single spaced
+            p.paragraph_format.line_spacing, p.paragraph_format.space_after = 1.0, Pt(4)
         add_runs(p, lead + text)
         continue
     buf.append(ln); i += 1
