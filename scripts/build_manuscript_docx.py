@@ -135,6 +135,10 @@ def add_table(rows: list[list[str]]):
             p.paragraph_format.line_spacing = 1.0
             p.paragraph_format.keep_with_next = i < len(rows) - 1   # keep the whole table on one page
             add_runs(p, cell.strip(), size=size, bold_all=(i == 0))
+            # size the paragraph mark too, so an empty cell is not as tall as a line of body text
+            mark = OxmlElement("w:rPr")   # rPr is the last child of pPr here, so appending keeps schema order
+            sz = OxmlElement("w:sz"); sz.set(qn("w:val"), str(int(size * 2))); mark.append(sz)
+            p._p.get_or_add_pPr().append(mark)
     for r in t.rows:   # keep each table row on one page
         trpr = r._tr.get_or_add_trPr()
         el = OxmlElement("w:cantSplit"); trpr.append(el)
