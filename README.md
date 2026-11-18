@@ -5,7 +5,7 @@ with atrial fibrillation (AF) detection as the worked example.
 
 Author: Tejas Menneni, Columbus State Community College.
 
-Archived on Zenodo: [doi:10.5281/zenodo.24042752](https://doi.org/10.5281/zenodo.24042752) (all versions; the manuscript cites v1.0.2, [doi:10.5281/zenodo.24042753](https://doi.org/10.5281/zenodo.24042753)).
+Archived on Zenodo: [doi:10.5281/zenodo.24042752](https://doi.org/10.5281/zenodo.24042752) (all versions). The Physiological Measurement manuscript cites v1.0.3, which adds the external noise analysis; the medRxiv version cites v1.0.2 ([doi:10.5281/zenodo.24042753](https://doi.org/10.5281/zenodo.24042753)).
 
 | Role | Dataset | What it gives the study |
 |---|---|---|
@@ -24,6 +24,7 @@ Full run, 5 seeds; 95% bootstrap CIs are in `outputs/tables/`.
 - Under electrode motion at −6 dB, AUROC drops by 0.09–0.12 for the learned models and by 0.30 for the rule. The CNN and gradient boosting do not differ significantly.
 - The models fail in opposite directions. Beat-based models lose specificity and raise false alarms (gradient boosting 0.98 → 0.82); the CNN loses sensitivity and misses AF (0.85 → 0.42).
 - Noise augmentation costs nothing on clean data and adds up to 0.030 AUROC and 0.18 F1 under severe noise.
+- The failure directions replicate on PTB-XL corrupted with the same noise (`scripts/external_noise.py`): under electrode motion at −6 dB the rule's specificity falls 0.91 → 0.38 and the CNN's sensitivity 0.86 → 0.50.
 - Quality-gated abstention helps little, and a threshold set on training data withholds 52% of clean PTB-XL recordings.
 
 ## Quick start
@@ -50,6 +51,15 @@ python -m ecgrobust report
 
 `scripts/finish_study.py --config <cfg> --train-log <log>` can instead wait for training to finish, check that every
 CNN converged, and then run the last three stages unattended.
+
+External replication under noise (added for the journal version; about 3.5 h on a laptop CPU). It corrupts PTB-XL
+lead I under electrode motion at +6, 0 and −6 dB and muscle artifact at −6 dB, scores the stored models unchanged, and
+writes `outputs/tables/external_noise.csv` and `external_noise_paired.csv`:
+
+```bash
+python scripts/external_noise.py --config configs/local.yaml --check   # confirms the stored results reproduce
+python scripts/external_noise.py --config configs/local.yaml
+```
 
 On Windows, keep the virtual environment on a short path (e.g. `C:\venvs\ecg`); pip fails on paths longer than 260 characters.
 
