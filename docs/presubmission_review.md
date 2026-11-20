@@ -67,8 +67,8 @@ flutter is handled, and whether predictive values are presented responsibly.
 
 ## Items the author must handle
 
-1. **Code archive.** The manuscript cites Zenodo v1.0.3, which predates the revision scripts. A v1.0.4 release (push to
-   GitHub, new Zenodo version) is needed before submission so the cited archive contains every analysis.
+1. **Code archive.** Done: release v1.0.4 with every revision script is archived at
+   https://doi.org/10.5281/zenodo.24400753 and cited in the manuscript.
 2. **Two references** could not be verified online and should be checked against the original sources: Elgendi et al
    (2010) and Engelse and Zeelenberg (1979). Moody and Mark (1983) follows PhysioNet's recommended citation for the
    AFDB.
