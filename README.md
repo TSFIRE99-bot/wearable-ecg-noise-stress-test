@@ -5,7 +5,7 @@ with atrial fibrillation (AF) detection as the worked example.
 
 Author: Tejas Menneni, Columbus State Community College.
 
-Archived on Zenodo: [doi:10.5281/zenodo.24042752](https://doi.org/10.5281/zenodo.24042752) (all versions). The Physiological Measurement manuscript cites v1.0.5 ([doi:10.5281/zenodo.24403118](https://doi.org/10.5281/zenodo.24403118)), which contains the revision analyses added in v1.0.4 (v1.0.3, [doi:10.5281/zenodo.24352330](https://doi.org/10.5281/zenodo.24352330), added the first external noise analysis); the medRxiv version cites v1.0.2 ([doi:10.5281/zenodo.24042753](https://doi.org/10.5281/zenodo.24042753)).
+Archived on Zenodo: [doi:10.5281/zenodo.24042752](https://doi.org/10.5281/zenodo.24042752) (all versions). The Physiological Measurement manuscript cites v1.0.6 ([doi:10.5281/zenodo.24403832](https://doi.org/10.5281/zenodo.24403832)), which contains the revision analyses added in v1.0.4 (v1.0.3, [doi:10.5281/zenodo.24352330](https://doi.org/10.5281/zenodo.24352330), added the first external noise analysis); the medRxiv version cites v1.0.2 ([doi:10.5281/zenodo.24042753](https://doi.org/10.5281/zenodo.24042753)).
 
 | Role | Dataset | What it gives the study |
 |---|---|---|
