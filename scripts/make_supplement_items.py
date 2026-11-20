@@ -75,9 +75,8 @@ def external_grid():
         for m in MODELS:
             r = d[(d.condition == c) & (d.model == m)].iloc[0]
             rows.append([cond_label(c) if m == "rule" else "", MODEL[m], ci(r.auroc, r.auroc_lo, r.auroc_hi),
-                         ci(r.sensitivity, r.sensitivity_lo, r.sensitivity_hi),
-                         ci(r.specificity, r.specificity_lo, r.specificity_hi), f(r.ppv), f(r.npv)])
-    return md(rows, ["Condition", "Model", "AUROC", "Sensitivity", "Specificity", "PPV", "NPV"])
+                         f(r.sensitivity), f(r.specificity), f(r.ppv), f(r.npv)])
+    return md(rows, ["Condition", "Model", "AUROC [95% CI]", "Sensitivity", "Specificity", "PPV", "NPV"])
 
 
 def rhythm():
@@ -116,7 +115,7 @@ def altnoise():
     strat = ["power-based (main)", "qrsamp", "burst"]
     rows = []
     for n in ["ma", "em"]:
-        for s in [6.0, 0.0, -6.0]:
+        for s in [0.0, -6.0]:
             for m in MODELS:
                 g = a[(a.noise == n) & (a.snr_db == s) & (a.model == m)].set_index("strategy")
                 rows.append([NOISE[n], snr(s), MODEL[m]] + [f"{f(g.loc[k].sensitivity)} / {f(g.loc[k].specificity)}"
@@ -127,7 +126,7 @@ def altnoise():
 def rpeak():
     d = pd.read_csv(T / "rpeak_validation.csv")
     rows = []
-    for (n, s) in [("none", float("inf")), ("em", 0.0), ("em", -6.0), ("ma", 0.0), ("ma", -6.0), ("bw", -6.0)]:
+    for (n, s) in [("none", float("inf")), ("em", -6.0), ("ma", -6.0)]:
         for det in DET:
             r = d[(d.rhythm == "all") & (d.noise == n) & (d.snr_db == s) & (d.detector == det)].iloc[0]
             rows.append(["All" if (n == "none" and det == "neurokit") else "", NOISE[n] if det == "neurokit" else "", "" if n == "none" else (snr(s) if det == "neurokit" else ""),
@@ -159,7 +158,7 @@ def oracle():
     o = o[o.variant == "standard"]
     rows = []
     for n in ["em", "ma"]:
-        for s in [12.0, 6.0, 0.0, -6.0]:
+        for s in [0.0, -6.0]:
             for m in ["rule", "logreg", "lgbm"]:
                 r = o[(o.noise == n) & (o.snr_db == s) & (o.model == m)].iloc[0]
                 rows.append([NOISE[n] if m == "rule" else "", snr(s) if m == "rule" else "", MODEL[m],
@@ -190,7 +189,7 @@ def regional():
     r = r[r.variant == "standard"]
     lab = {"full": "Full", "qrs_only": "Within QRS only", "nonqrs_only": "Outside QRS only"}
     rows = []
-    for s in [0.0, -6.0]:
+    for s in [-6.0]:
         for m in MODELS:
             for reg in ["full", "qrs_only", "nonqrs_only"]:
                 x = r[(r.snr_db == s) & (r.model == m) & (r.region == reg)].iloc[0]
@@ -202,15 +201,15 @@ def regional():
 
 def cnn():
     c = pd.read_csv(T / "rev_cnn.csv")
-    c = c[c.condition.str.contains("clean") | c.condition.str.contains(r"\+6dB|\+0dB|-6dB")]
+    c = c[(c.variant == "standard") & (c.condition.str.contains("clean") | c.condition.str.contains(r"\+6dB|\+0dB|-6dB"))]
     rows = []
     for _, r in c.sort_values(["variant", "condition"], key=lambda s: s.map(snr_order) if s.name == "condition" else
                               s.map({"standard": 0, "augmented": 1})).iterrows():
-        rows.append(["Standard" if r.variant == "standard" else "Augmented", cond_label(r.condition),
+        rows.append([cond_label(r.condition),
                      f(r.mean_prob_af), f(r.mean_prob_non_af), f(r.auroc), f"{f(r.sens_fixed)} / {f(r.spec_fixed)}",
                      "–" if pd.isna(r.sens_noise_threshold) else f"{f(r.sens_noise_threshold)} / {f(r.spec_noise_threshold)}",
                      f(r.sens_at_clean_specificity_diagnostic)])
-    return md(rows, ["Training", "Condition", "Mean prob., AF", "Mean prob., non-AF", "AUROC",
+    return md(rows, ["Condition", "Mean prob., AF", "Mean prob., non-AF", "AUROC",
                      "Fixed threshold: sens. / spec.", "Noise-specific threshold: sens. / spec.",
                      "Sens. at clean specificity (diagnostic)"])
 
@@ -218,12 +217,12 @@ def cnn():
 def afdb():
     a = pd.read_csv(T / "afdb_by_quality.csv").drop_duplicates(["variant", "model", "condition", "quality_fifth"])
     rows = []
-    for v in ["standard", "augmented"]:
+    for v in ["standard"]:
         nat = a[(a.variant == v) & (a.condition == "natural")]
         for q in ["Q1 (noisiest)", "Q2", "Q3", "Q4", "Q5 (cleanest)"]:
             for m in MODELS:
                 r = nat[(nat.quality_fifth == q) & (nat.model == m)].iloc[0]
-                rows.append(["Standard" if v == "standard" else "Augmented", f"Natural, {q}", MODEL[m],
+                rows.append([f"Natural, {q}" if m == "rule" else "", MODEL[m],
                              f"{int(r.n_windows):,} ({int(r.n_af):,})", f(r.auroc),
                              ci(r.sensitivity, r.sensitivity_lo, r.sensitivity_hi),
                              ci(r.specificity, r.specificity_lo, r.specificity_hi)])
@@ -231,11 +230,10 @@ def afdb():
             for m in MODELS:
                 r = a[(a.variant == v) & (a.condition == c) & (a.model == m)].iloc[0]
                 n, s = c.split("_")[1], c.split("_")[2].replace("dB", "")
-                rows.append(["Standard" if v == "standard" else "Augmented", f"Q5 + {NOISE[n].lower()}, {snr(float(s))}",
-                             MODEL[m], f"{int(r.n_windows):,} ({int(r.n_af):,})", f(r.auroc),
+                rows.append([f"Q5 + {NOISE[n].lower()}, {snr(float(s))}" if m == "rule" else "", MODEL[m], f"{int(r.n_windows):,} ({int(r.n_af):,})", f(r.auroc),
                              ci(r.sensitivity, r.sensitivity_lo, r.sensitivity_hi),
                              ci(r.specificity, r.specificity_lo, r.specificity_hi)])
-    return md(rows, ["Training", "Windows", "Model", "n (AF)", "AUROC", "Sensitivity", "Specificity"])
+    return md(rows, ["Windows", "Model", "n (AF)", "AUROC", "Sensitivity", "Specificity"])
 
 
 def augablation():
@@ -259,20 +257,21 @@ def augablation():
 def selective_thresholds():
     s = pd.read_csv(T / "selective_thresholds.csv")
     s = s[s.model == "lgbm"]
+
+    def get(meas, cond, pol):
+        g = s[(s.measure == meas) & (s.condition == cond) & s.policy.str.startswith(pol)]
+        return g.iloc[0] if not g.empty else None
+
     rows = []
     for meas in MEAS:
-        for c in ["internal__clean", "internal__em__-6dB__r0", "external__clean", "external__em__-6dB__r0"]:
-            for pol in ["source", "target"]:
-                g = s[(s.measure == meas) & (s.condition == c) & s.policy.str.startswith(pol)]
-                if g.empty:
-                    continue
-                r = g.iloc[0]
-                rows.append([MEAS[meas], ("PTB-XL, " if c.startswith("external") else "Internal, ") + lc(cond_label(c)),
-                             "CinC" if pol == "source" else "PTB-XL half A", f"{100 * r.withheld_all:.1f}",
-                             f"{100 * r.withheld_af:.1f}", f"{100 * r.withheld_non_af:.1f}",
-                             f"{f(r.sensitivity)} / {f(r.specificity)}"])
-    return md(rows, ["Measure", "Test condition", "Threshold set on", "Withheld, %", "AF withheld, %",
-                     "Non-AF withheld, %", "Gradient boosting on retained: sens. / spec."])
+        i = get(meas, "internal__em__-6dB__r0", "source")
+        c_src, c_tgt = get(meas, "external__clean", "source"), get(meas, "external__clean", "target")
+        rows.append([MEAS[meas], f"{100 * i.withheld_af:.1f} / {100 * i.withheld_non_af:.1f}",
+                     f"{f(i.sensitivity)} / {f(i.specificity)}", f"{100 * c_src.withheld_all:.1f}",
+                     f"{100 * c_tgt.withheld_all:.1f}"])
+    return md(rows, ["Measure", "Internal EM −6 dB, CinC threshold: AF / non-AF withheld, %",
+                     "Internal EM −6 dB: GB sens. / spec. on retained", "Clean PTB-XL withheld, CinC threshold, %",
+                     "Clean PTB-XL withheld, PTB-XL threshold, %"])
 
 
 def selective_curves():

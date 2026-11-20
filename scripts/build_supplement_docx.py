@@ -176,6 +176,7 @@ def render_md(path: Path):
     A paragraph that starts with **Table** is a caption above its table, one that starts with **Figure** a caption
     below its figure, and the paragraph right after a table is that table's note."""
     lines, i, buf, after_table = path.read_text(encoding="utf-8").splitlines(), 0, [], False
+    first_section = True
 
     def flush():
         nonlocal buf, after_table
@@ -196,7 +197,11 @@ def render_md(path: Path):
         if not s:
             flush(); i += 1; continue
         if ln.startswith("## "):
-            flush(); doc.add_heading(ln[3:].strip(), level=1).paragraph_format.page_break_before = True; i += 1; continue
+            flush()
+            # only the first section of each file starts a new page; later items follow on (tables never split)
+            doc.add_heading(ln[3:].strip(), level=1).paragraph_format.page_break_before = first_section
+            first_section = False
+            i += 1; continue
         if ln.startswith("### "):
             flush(); doc.add_heading(ln[4:].strip(), level=2); i += 1; continue
         fm = re.match(r"!\[[^\]]*\]\(([^)]+)\)", s)
@@ -262,7 +267,7 @@ caption("Figure S1.", "Flow of recordings through the study. The PhysioNet/Compu
         "artifact; em, electrode motion; SNR, signal-to-noise ratio).", above=False)
 
 # Table S1: four-class challenge score
-doc.add_heading("Supplementary table S1", level=1).paragraph_format.page_break_before = True
+doc.add_heading("Supplementary table S1", level=1).paragraph_format.page_break_before = False
 f4 = pd.read_csv(TAB / "fourclass_challenge.csv")
 f4["model"] = f4["model"].map(lambda m: MODEL.get(m, m))
 f4 = f4.rename(columns={"model": "Model", "n_seeds": "Seeds", "challenge_F1_NAO": "Challenge score, mean F1 (N, A, O) [95% CI]",
@@ -280,7 +285,7 @@ note("N, normal rhythm; A, atrial fibrillation; O, other rhythm; ~, noisy; CI, c
      "models with five.")
 
 # Table S2: external subgroups
-doc.add_heading("Supplementary table S2", level=1).paragraph_format.page_break_before = True
+doc.add_heading("Supplementary table S2", level=1).paragraph_format.page_break_before = False
 sg = pd.read_csv(TAB / "subgroups_external.csv")
 sg = sg[sg.variant == "standard"].drop(columns="variant")
 sg["model"] = sg["model"].map(lambda m: MODEL.get(m, m))
@@ -297,7 +302,7 @@ note("Sex is as recorded in the PTB-XL metadata. AF, atrial fibrillation; AUROC,
      "characteristic curve; AUPRC, area under the precision-recall curve.")
 
 # Table S3: TRIPOD+AI mapping
-doc.add_heading("Supplementary table S3", level=1).paragraph_format.page_break_before = True
+doc.add_heading("Supplementary table S3", level=1).paragraph_format.page_break_before = False
 md = (ROOT / "docs" / "TRIPOD_AI_checklist.md").read_text(encoding="utf-8")
 rows = [l.strip().strip("|").split("|") for l in md.splitlines() if l.startswith("|")]
 rows = [[c.strip() for c in r] for r in rows if not all(set(c.strip()) <= set("-:") for c in r)]

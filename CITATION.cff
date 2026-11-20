@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite the accompanying article and this archive."
 title: "ecgrobust: a framework for evaluating wearable ECG classifiers under real-world noise"
-version: 1.0.3
-date-released: 2026-11-18
+version: 1.0.4
+date-released: 2026-11-20
 license: MIT
 authors:
   - family-names: "Menneni"
@@ -21,3 +21,9 @@ references:
   - type: dataset
     title: "MIT-BIH Noise Stress Test Database"
     doi: 10.13026/C2HS3T
+  - type: dataset
+    title: "MIT-BIH Arrhythmia Database"
+    doi: 10.13026/C2F305
+  - type: dataset
+    title: "MIT-BIH Atrial Fibrillation Database"
+    doi: 10.13026/C2MW2D
