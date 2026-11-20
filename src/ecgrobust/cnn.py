@@ -88,9 +88,10 @@ def predict(model: nn.Module, signals: list[np.ndarray], fs: int, ccfg: dict, n_
     wins = _zscore(np.stack(wins).astype(np.float32))
     owner = np.asarray(owner)
     probs = []
-    for b in range(0, len(wins), batch):
-        logits = model(torch.from_numpy(wins[b:b + batch, None, :]))
-        probs.append(torch.sigmoid(logits[:, 0]).numpy() if n_out == 1 else torch.softmax(logits, 1).numpy())
+    with torch.inference_mode():   # no autograd graph at inference: same outputs, less time and memory
+        for b in range(0, len(wins), batch):
+            logits = model(torch.from_numpy(wins[b:b + batch, None, :]))
+            probs.append(torch.sigmoid(logits[:, 0]).numpy() if n_out == 1 else torch.softmax(logits, 1).numpy())
     probs = np.concatenate(probs)
     if n_out == 1:
         return np.bincount(owner, weights=probs, minlength=len(signals)) / np.bincount(owner, minlength=len(signals))

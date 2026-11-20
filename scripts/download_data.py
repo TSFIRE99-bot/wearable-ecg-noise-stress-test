@@ -1,9 +1,10 @@
-"""Download the three public datasets from PhysioNet (open access, no login).
+"""Download the public datasets from PhysioNet (open access, no login).
 
-    python scripts/download_data.py            # all three
+    python scripts/download_data.py            # all five
     python scripts/download_data.py --only nstdb
 
-Approximate sizes: CinC 2017 ~100 MB, NSTDB ~20 MB, PTB-XL ~1.7 GB (zip; ~3 GB unpacked).
+Approximate sizes: CinC 2017 ~100 MB, NSTDB ~20 MB, PTB-XL ~1.7 GB (zip; ~3 GB unpacked), MIT-BIH Arrhythmia
+Database ~100 MB and MIT-BIH Atrial Fibrillation Database ~600 MB (both used only by the revision analyses).
 """
 from __future__ import annotations
 
@@ -46,6 +47,18 @@ def nstdb() -> None:
     wfdb.dl_database("nstdb", str(RAW / "nstdb"), records=["bw", "ma", "em"])
 
 
+def mitdb() -> None:
+    import wfdb
+
+    wfdb.dl_database("mitdb", str(RAW / "mitdb"))
+
+
+def afdb() -> None:
+    import wfdb
+
+    wfdb.dl_database("afdb", str(RAW / "afdb"))
+
+
 def ptbxl() -> None:
     d = RAW / "ptb-xl"
     if (d / "ptbxl_database.csv").exists():
@@ -68,10 +81,10 @@ def ptbxl() -> None:
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--only", choices=["cinc2017", "nstdb", "ptbxl"], nargs="*")
+    ap.add_argument("--only", choices=["cinc2017", "nstdb", "ptbxl", "mitdb", "afdb"], nargs="*")
     ap.add_argument("--root", default="data/raw", help="where raw data go (use a short path on Windows)")
     a = ap.parse_args()
     RAW = Path(a.root)
-    for name in a.only or ["cinc2017", "nstdb", "ptbxl"]:
+    for name in a.only or ["cinc2017", "nstdb", "ptbxl", "mitdb", "afdb"]:
         globals()[name]()
     print("done")

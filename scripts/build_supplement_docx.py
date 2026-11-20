@@ -7,7 +7,7 @@
 Writes paper/submission/physiol_meas/supplementary[_anonymous][_no_figures].docx with the supplementary
 methods (paper/supplement_methods.md), figure S1 (flow of recordings), tables S1-S3 built from outputs/ and
 docs/ (four-class scores, external subgroups, TRIPOD+AI mapping), and the tables and figures moved out of the
-main text (paper/supplement_items.md: tables S4-S7, figures S2-S4). IOP asks for a title (30 characters or
+main text (paper/supplement_items.md: tables S4-S18, figures S2-S6). IOP asks for a title (30 characters or
 fewer) and a description (30 words or fewer) inside the file.
 """
 from __future__ import annotations
@@ -20,6 +20,7 @@ import pandas as pd
 from docx import Document
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Inches, Pt, RGBColor
 
@@ -31,8 +32,9 @@ OUT = ROOT / "paper" / "submission" / "physiol_meas" / ("supplementary" + ("_ano
                                        + ("_no_figures" if NO_FIGURES else "") + ".docx")
 TITLE = "Stress-testing wearable ECG atrial fibrillation classifiers with real recorded noise"
 SUPP_TITLE = "Extended methods and results"    # 28 characters
-SUPP_DESCRIPTION = ("Extended methods, flow of recordings, four-class scores, external subgroups, TRIPOD+AI mapping, "
-                    "cohort table, full noise and abstention results, calibration and feature importance under noise.")
+SUPP_DESCRIPTION = ("Extended methods, data audit, literature comparison, full external noise grid, beat-detection "
+                    "validation, mechanism, natural-noise, augmentation-ablation, quality-measure and operating-point "
+                    "results.")
 assert len(SUPP_TITLE) <= 30 and len(SUPP_DESCRIPTION.split()) <= 30
 FONT = "Times New Roman"
 ci = lambda s: re.sub(r" \(±[0-9.]+\)", "", str(s))  # noqa: E731  (drop the seed SD; keep mean [95% CI])
@@ -66,16 +68,73 @@ if title_ppr is not None and title_ppr.find(qn("w:pBdr")) is not None:
     title_ppr.remove(title_ppr.find(qn("w:pBdr")))
 
 
+TEXT_WIDTH = 6.5   # inches between the 1 in margins of a Letter page
+CELL_PAD = 0.16    # inches of left + right cell margin in Word's Table Grid style
+
+
+def _text_inches(text: str, size: float, bold: bool = False) -> float:
+    """Printed width of text in Times New Roman, measured from the installed font (fallback: estimate)."""
+    try:
+        from PIL import ImageFont
+        font = ImageFont.truetype("timesbd.ttf" if bold else "times.ttf", 100)
+        return font.getlength(text) * size / 100 / 72
+    except Exception:
+        return len(text) * size * 0.45 / 72
+
+
+def column_widths(rows: list[list[str]], size: float) -> list[float] | None:
+    """Same rule as the manuscript builder: each column gets the width of its longest cell (headers may wrap); if the
+    table is too wide, number columns keep their width and only text columns wrap. None if even that does not fit."""
+    ncol = len(rows[0])
+    need, floor, numeric = [], [], []
+    for j in range(ncol):
+        body = [r[j].strip() for r in rows[1:]]
+        head = rows[0][j].strip()
+        w_body = max((_text_inches(x, size) for x in body), default=0)
+        w_head = max((_text_inches(w, size, True) for w in head.split()), default=0)
+        need.append(max(w_body, w_head) + CELL_PAD)
+        short = max((len(x) for x in body), default=0) <= 12
+        floor.append(need[-1] if short else
+                     max([_text_inches(w, size) for x in body for w in x.split()] + [w_head]) + CELL_PAD)
+        numeric.append(sum(ch.isdigit() for x in body for ch in x) > 0.4 * max(1, sum(len(x) for x in body)))
+    if sum(need) <= TEXT_WIDTH:
+        return [w * TEXT_WIDTH / sum(need) for w in need]
+    fixed = sum(n for n, num in zip(need, numeric) if num)
+    rest = TEXT_WIDTH - fixed
+    text_need = sum(n for n, num in zip(need, numeric) if not num)
+    widths = [n if num else max(f, n * rest / text_need) if text_need else n
+              for n, f, num in zip(need, floor, numeric)]
+    return widths if sum(widths) <= TEXT_WIDTH + 1e-6 else None
+
+
 def table(df: pd.DataFrame, size: float = 8):
-    t = doc.add_table(rows=len(df) + 1, cols=len(df.columns))
-    t.style, t.alignment = "Table Grid", WD_TABLE_ALIGNMENT.CENTER
-    for r, row in enumerate([list(df.columns)] + df.astype(str).values.tolist()):
+    rows = [list(df.columns)] + df.astype(str).values.tolist()
+    rows = [[c.replace("`", "") for c in r] for r in rows]
+    ncol = len(rows[0])
+    t = doc.add_table(rows=len(rows), cols=ncol)
+    t.style, t.alignment, t.autofit = "Table Grid", WD_TABLE_ALIGNMENT.CENTER, False
+    widths = None
+    while widths is None and size >= 6.5:
+        widths = column_widths(rows, size)
+        if widths is None:
+            size -= 0.5
+    if widths is None:
+        size, widths = 6.5, [TEXT_WIDTH / ncol] * ncol
+    long = len(rows) > 28   # a table longer than a page may break; its header row repeats
+    for r, row in enumerate(rows):
         for c, val in enumerate(row):
-            p = t.cell(r, c).paragraphs[0]
+            cell = t.cell(r, c)
+            cell.width = Inches(widths[c])
+            p = cell.paragraphs[0]
             p.paragraph_format.space_after, p.paragraph_format.line_spacing = Pt(0), 1.0
-            p.paragraph_format.keep_with_next = r < len(df)   # keep each table on one page
-            run = p.add_run(val.replace("`", ""))
+            p.paragraph_format.keep_with_next = (r < len(rows) - 1) if not long else (r < 2)
+            run = p.add_run(val)
             run.font.size, run.bold = Pt(size), r == 0
+    for r, tr in enumerate(t.rows):
+        trpr = tr._tr.get_or_add_trPr()
+        trpr.append(OxmlElement("w:cantSplit"))
+        if r == 0 and long:
+            hdr = OxmlElement("w:tblHeader"); hdr.set(qn("w:val"), "true"); trpr.append(hdr)
 
 
 def caption(label: str, text: str, above: bool = True):
@@ -123,7 +182,7 @@ def render_md(path: Path):
         if not buf:
             return
         text = " ".join(s.strip() for s in buf)
-        m = re.match(r"\*\*((?:Table|Figure) S\d+\.)\*\* (.*)", text)
+        m = re.match(r"\*\*((?:Table|Figure) S\d+[a-z]?(?: \(continued\))?\.)\*\* (.*)", text)
         if m:
             caption(m.group(1), m.group(2), above=m.group(1).startswith("Table"))
         elif after_table:
@@ -158,7 +217,7 @@ def render_md(path: Path):
                 if not all(re.fullmatch(r":?-{3,}:?", c) for c in cells):
                     rows.append(cells)
                 i += 1
-            table(pd.DataFrame(rows[1:], columns=rows[0]), size=8 if len(rows[0]) <= 7 else 7.5)
+            table(pd.DataFrame(rows[1:], columns=rows[0]), size=8.5 if len(rows[0]) <= 7 else 8)
             after_table = True
             continue
         if s.startswith("- "):

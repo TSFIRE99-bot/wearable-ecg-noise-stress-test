@@ -17,3 +17,5 @@ paper/archive/
 
 # manuscript kept local until the medRxiv preprint is posted
 paper/
+
+.env

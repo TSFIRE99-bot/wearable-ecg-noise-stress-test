@@ -36,7 +36,7 @@ P_FEATURES = ["p_present_frac", "p_amp_ratio_mean", "p_amp_cv", "p_pr_sd", "p_pr
 QRS_FEATURES = ["qrs_dur_mean", "qrs_corr_mean", "qrs_corr_min_frac", "qrs_ramp_cv"]
 FEATURES = RR_FEATURES + P_FEATURES + QRS_FEATURES
 QUALITY = ["q_avgqrs", "q_zhao", "q_ksqi", "q_psqi", "q_bassqi"]
-BEAT = ["beat_ref", "beat_tp", "beat_fp", "beat_fn"]
+BEAT = ["beat_ref", "beat_tp", "beat_fp", "beat_fn", "beat_offset_ms"]
 
 
 # --------------------------------------------------------------------------- helpers
@@ -68,20 +68,25 @@ def cosen(rr_s: np.ndarray) -> float:
     return np.nan
 
 
-def match_beats(ref: np.ndarray, test: np.ndarray, tol: int) -> tuple[int, int, int]:
-    """Greedy one-to-one matching within +-tol samples. Returns TP, FP, FN."""
+def match_beats(ref: np.ndarray, test: np.ndarray, tol: int, return_offset: bool = False):
+    """Greedy one-to-one matching within +-tol samples. Returns TP, FP, FN (and, with ``return_offset``,
+    the mean absolute offset of the matched beats in samples)."""
     ref, test = np.sort(ref), np.sort(test)
     i = j = tp = 0
+    off = 0.0
     while i < len(ref) and j < len(test):
         d = test[j] - ref[i]
         if abs(d) <= tol:
             tp += 1
+            off += abs(d)
             i += 1
             j += 1
         elif d < 0:
             j += 1
         else:
             i += 1
+    if return_offset:
+        return tp, len(test) - tp, len(ref) - tp, (off / tp if tp else np.nan)
     return tp, len(test) - tp, len(ref) - tp
 
 
@@ -105,7 +110,11 @@ def _band_power(f, pxx, lo, hi):
 
 # --------------------------------------------------------------------------- main
 def extract_one(sig: np.ndarray, fs: int, fcfg: dict, ref_peaks: np.ndarray | None = None,
-                return_peaks: bool = False) -> dict:
+                return_peaks: bool = False, peaks: np.ndarray | None = None, detector: str = "neurokit") -> dict:
+    """Features of one recording.
+
+    ``peaks`` replaces R-peak detection with the given locations (used to isolate the effect of detection
+    errors); ``detector`` selects another NeuroKit2 R-peak detector (default: the one used by the study)."""
     import neurokit2 as nk
 
     out: dict = {k: np.nan for k in FEATURES + QUALITY}
@@ -122,6 +131,7 @@ def extract_one(sig: np.ndarray, fs: int, fcfg: dict, ref_peaks: np.ndarray | No
     except Exception:
         pass
 
+    given = peaks
     peaks = np.array([], dtype=int)
     try:
         try:
@@ -130,15 +140,26 @@ def extract_one(sig: np.ndarray, fs: int, fcfg: dict, ref_peaks: np.ndarray | No
             sig_inv = sig
         clean = nk.ecg_clean(sig_inv, sampling_rate=fs, method="neurokit")
         out["q_ksqi"] = float(kurtosis(clean, fisher=False))
-        _, info = nk.ecg_peaks(clean, sampling_rate=fs, method="neurokit", correct_artifacts=False)
-        peaks = np.asarray(info["ECG_R_Peaks"], dtype=int)
+        if given is not None:
+            peaks = np.asarray(given, dtype=int)
+            peaks = peaks[(peaks >= 0) & (peaks < len(clean))]
+        else:
+            det_in = clean
+            if detector != "neurokit":
+                try:
+                    det_in = nk.ecg_clean(sig_inv, sampling_rate=fs, method=detector)
+                except Exception:
+                    pass
+            _, info = nk.ecg_peaks(det_in, sampling_rate=fs, method=detector, correct_artifacts=False)
+            peaks = np.asarray(info["ECG_R_Peaks"], dtype=int)
     except Exception as e:  # catastrophic failure -> all NaN
         LOG.debug("peak detection failed: %s", e)
         clean = sig
 
     if ref_peaks is not None:
-        tp, fp, fn = match_beats(np.asarray(ref_peaks), peaks, int(round(fcfg["beat_match_tolerance_ms"] * fs / 1000)))
-        out.update(beat_ref=len(ref_peaks), beat_tp=tp, beat_fp=fp, beat_fn=fn)
+        tp, fp, fn, off = match_beats(np.asarray(ref_peaks), peaks, int(round(fcfg["beat_match_tolerance_ms"] * fs / 1000)),
+                                      return_offset=True)
+        out.update(beat_ref=len(ref_peaks), beat_tp=tp, beat_fp=fp, beat_fn=fn, beat_offset_ms=off / fs * 1000)
 
     out["rr_n_beats"] = len(peaks)
     if len(peaks) >= fcfg["min_beats"]:
@@ -236,12 +257,14 @@ def _morph_features(clean: np.ndarray, peaks: np.ndarray, fs: int) -> dict:
 
 
 def extract_many(signals: dict, fs: int, fcfg: dict, ref_peaks: dict | None = None,
-                 return_peaks: bool = False, desc: str = "") -> pd.DataFrame:
+                 return_peaks: bool = False, desc: str = "", peaks: dict | None = None,
+                 detector: str = "neurokit") -> pd.DataFrame:
     from joblib import Parallel, delayed
 
     ids = list(signals)
     rows = Parallel(n_jobs=fcfg["n_jobs"], batch_size=16)(
-        delayed(extract_one)(signals[r], fs, fcfg, None if ref_peaks is None else ref_peaks[r], return_peaks)
+        delayed(extract_one)(signals[r], fs, fcfg, None if ref_peaks is None else ref_peaks[r], return_peaks,
+                             None if peaks is None else peaks[r], detector)
         for r in ids
     )
     df = pd.DataFrame(rows, index=pd.Index(ids, name="record_id"))

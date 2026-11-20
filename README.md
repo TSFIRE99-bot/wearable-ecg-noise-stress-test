@@ -23,9 +23,10 @@ Full run, 5 seeds; 95% bootstrap CIs are in `outputs/tables/`.
 - Clean internal AUROC: CNN 0.984, gradient boosting 0.981, logistic regression 0.972, rule 0.848. On PTB-XL the learned models reach 0.987–0.990 and the rule 0.926.
 - Under electrode motion at −6 dB, AUROC drops by 0.09–0.12 for the learned models and by 0.30 for the rule. The CNN and gradient boosting do not differ significantly.
 - The models fail in opposite directions. Beat-based models lose specificity and raise false alarms (gradient boosting 0.98 → 0.82); the CNN loses sensitivity and misses AF (0.85 → 0.42).
-- Noise augmentation costs nothing on clean data and adds up to 0.030 AUROC and 0.18 F1 under severe noise.
-- The failure directions replicate on PTB-XL corrupted with the same noise (`scripts/external_noise.py`): under electrode motion at −6 dB the rule's specificity falls 0.91 → 0.38 and the CNN's sensitivity 0.86 → 0.50.
-- Quality-gated abstention helps little, and a threshold set on training data withholds 52% of clean PTB-XL recordings.
+- Noise augmentation leaves clean performance unchanged and adds up to 0.030 AUROC under severe noise, but only for the noise types it contains (`rev_augablation.csv`).
+- The failure directions replicate on PTB-XL corrupted with the full noise grid (`scripts/external_noise.py`): under electrode motion at −6 dB the rule's specificity falls 0.91 → 0.38 and the CNN's sensitivity 0.86 → 0.50.
+- The false alarms start in beat detection. Against cardiologist annotations the R-peak detector adds about 15 spurious beats per minute at −6 dB electrode motion, and clean-signal R peaks restore the feature models' specificity (`rev_rpeak_validation.csv`, `rev_oracle.csv`).
+- Quality thresholds transfer poorly: a threshold set on CinC training data withholds 0–52% of clean PTB-XL recordings depending on the measure (`selective_thresholds.csv`).
 
 ## Quick start
 
@@ -60,6 +61,29 @@ writes `outputs/tables/external_noise.csv` and `external_noise_paired.csv`:
 python scripts/external_noise.py --config configs/local.yaml --check   # confirms the stored results reproduce
 python scripts/external_noise.py --config configs/local.yaml
 ```
+
+Revision analyses (journal revision; each script is resumable and writes to `outputs/revision/` and
+`outputs/tables/`). On an 8-core laptop CPU they take about a day in total, most of it CNN scoring:
+
+```bash
+python scripts/audit_data.py --config configs/local.yaml               # leakage, duplicates, PTB-XL label audit
+python scripts/external_noise.py --config configs/local.yaml           # full 18-condition PTB-XL grid
+python scripts/internal_revision.py --config configs/local.yaml all    # extra noise draws, alternative generators,
+                                                                       # clean-signal R peaks, regional noise, CNN thresholds
+python scripts/rpeak_validation.py --config configs/local.yaml         # 7 detectors vs MIT-BIH expert beat annotations
+python scripts/detector_ablation.py --config configs/local.yaml        # feature models refitted on other detectors
+python scripts/selective_prediction.py --config configs/local.yaml     # 7 quality measures, coverage-risk, transfer
+python scripts/natural_noise_afdb.py --config configs/local.yaml       # naturally noisy Holter recordings (AFDB)
+python scripts/augmentation_ablation.py --config configs/local.yaml all-tabular
+python scripts/augmentation_ablation.py --config configs/local.yaml train-cnn --cnn-seeds 0 1 2
+python scripts/augmentation_ablation.py --config configs/local.yaml evaluate
+python scripts/revision_stats.py --config configs/local.yaml           # all revision tables + docs/revision_results.md
+python scripts/make_revision_figures.py --config configs/local.yaml
+python scripts/make_supplement_items.py                                # supplementary tables from the result files
+```
+
+The MIT-BIH Arrhythmia Database (`mitdb`) and MIT-BIH Atrial Fibrillation Database (`afdb`) are read from
+`<raw_dir>/mitdb` and `<raw_dir>/afdb`; download them from PhysioNet first.
 
 On Windows, keep the virtual environment on a short path (e.g. `C:\venvs\ecg`); pip fails on paths longer than 260 characters.
 

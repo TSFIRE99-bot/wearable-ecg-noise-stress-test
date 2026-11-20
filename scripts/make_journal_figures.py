@@ -149,7 +149,8 @@ def fig2(w, h):
     """(a) R-peak detection F1 vs SNR; (b) classifier AUROC vs beat-detection F1."""
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(w, h), layout="constrained")
     B = beats[beats.dataset == "internal"]
-    ncol = {"bw": "#6250d6", "ma": "#e34948", "em": "#008300"}
+    # noise types in greys (the colours are reserved for the four models in every other figure)
+    ncol = {"bw": "#a3a29c", "ma": "#52514e", "em": "#0b0b0b"}
     nmark = {"bw": "o", "ma": "s", "em": "^"}
     for t in types:
         d = B[B.noise == t].set_index("snr_db").loc[snrs]
@@ -163,11 +164,13 @@ def fig2(w, h):
     for m in models:
         d = N[N.model == m]
         xs = [Bk.loc[(row.noise, row.snr_db), "f1"] for row in d.itertuples()]
-        a2.scatter(xs, d.auroc, color=COLOR[m], marker=MARKER[m], s=16, label=LABEL[m], edgecolor="white", linewidth=0.6)
+        # hollow markers, so the three learned models stay visible where their points overlap
+        a2.scatter(xs, d.auroc, facecolor="none", edgecolor=COLOR[m], marker=MARKER[m], s=34, linewidth=1.1,
+                   label=LABEL[m])
     a2.set_xlabel("R-peak detection F1 in that condition")
     a2.set_ylabel("AUROC")
     # legend below panel (b); inside the panel it covers the rule points near F1 0.93-0.94
-    a2.legend(loc="upper center", bbox_to_anchor=(0.5, -0.22), ncol=2, frameon=False)
+    a2.legend(loc="upper center", bbox_to_anchor=(0.5, -0.22), ncol=2, frameon=False, markerscale=1.3)
     a2.set_title("(b)")
     return fig
 
@@ -206,8 +209,8 @@ def fig4(w, h):
 
 
 def fig5(w, h):
-    """Reliability curves for gradient boosting and the CNN: clean vs electrode motion 12 and 0 dB."""
-    em_snrs = [s for s in snrs if s in (12.0, 0.0)] or snrs[-1:]
+    """Reliability curves for gradient boosting and the CNN: clean vs electrode motion 12 and -6 dB."""
+    em_snrs = [s for s in snrs if s in (12.0, -6.0)] or snrs[-1:]
     cs = ["internal__clean"] + [c for c in r.conds if c.startswith("internal__em__") and _cond_from_key(c).snr_db in em_snrs]
     show = [m for m in ["lgbm", "cnn"] if m in models]
     # square panels placed explicitly (inches), so the figure width is predictable

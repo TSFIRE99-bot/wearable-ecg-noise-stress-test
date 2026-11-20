@@ -1,0 +1,169 @@
+measure,policy,condition,subgroup,n,withheld
+avgqrs,"source (CinC training, 5th percentile)",external__clean,female,10445,0.510387745332695
+avgqrs,"source (CinC training, 5th percentile)",external__clean,male,11354,0.5199048793376784
+avgqrs,"source (CinC training, 5th percentile)",external__clean,age < 65,12310,0.5280259951259139
+avgqrs,"source (CinC training, 5th percentile)",external__clean,age >= 65,9489,0.4988934555801454
+avgqrs,"target (PTB-XL half A, 5th percentile)",external__clean,female,5249,0.04477043246332635
+avgqrs,"target (PTB-XL half A, 5th percentile)",external__clean,male,5650,0.05238938053097342
+avgqrs,"target (PTB-XL half A, 5th percentile)",external__clean,age < 65,6170,0.05202593192868721
+avgqrs,"target (PTB-XL half A, 5th percentile)",external__clean,age >= 65,4729,0.04440685134277855
+avgqrs,"source (CinC training, 5th percentile)",external__em__-6dB__r0,female,10445,0.6665390138822402
+avgqrs,"source (CinC training, 5th percentile)",external__em__-6dB__r0,male,11354,0.653426105337326
+avgqrs,"source (CinC training, 5th percentile)",external__em__-6dB__r0,age < 65,12310,0.6530463038180341
+avgqrs,"source (CinC training, 5th percentile)",external__em__-6dB__r0,age >= 65,9489,0.6683528295921594
+avgqrs,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,female,5249,0.06172604305582019
+avgqrs,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,male,5650,0.06159292035398234
+avgqrs,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,age < 65,6170,0.06320907617504057
+avgqrs,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,age >= 65,4729,0.0596320575174456
+avgqrs,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,female,10445,0.5096218286261369
+avgqrs,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,male,11354,0.5053725559274265
+avgqrs,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,age < 65,12310,0.5165718927701056
+avgqrs,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,age >= 65,9489,0.49552112972916007
+avgqrs,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,female,5249,0.0510573442560488
+avgqrs,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,male,5650,0.04884955752212394
+avgqrs,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,age < 65,6170,0.049270664505672634
+avgqrs,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,age >= 65,4729,0.05075068724888987
+zhao,"source (CinC training, 5th percentile)",external__clean,female,10445,0.0
+zhao,"source (CinC training, 5th percentile)",external__clean,male,11354,8.807468733484924e-05
+zhao,"source (CinC training, 5th percentile)",external__clean,age < 65,12310,0.0
+zhao,"source (CinC training, 5th percentile)",external__clean,age >= 65,9489,0.00010538518284330944
+zhao,"target (PTB-XL half A, 5th percentile)",external__clean,female,5249,0.004953324442750984
+zhao,"target (PTB-XL half A, 5th percentile)",external__clean,male,5650,0.004424778761061954
+zhao,"target (PTB-XL half A, 5th percentile)",external__clean,age < 65,6170,0.004862236628849326
+zhao,"target (PTB-XL half A, 5th percentile)",external__clean,age >= 65,4729,0.004440685134277866
+zhao,"source (CinC training, 5th percentile)",external__em__-6dB__r0,female,10445,9.573958831976537e-05
+zhao,"source (CinC training, 5th percentile)",external__em__-6dB__r0,male,11354,0.00026422406200454773
+zhao,"source (CinC training, 5th percentile)",external__em__-6dB__r0,age < 65,12310,0.0002437043054427379
+zhao,"source (CinC training, 5th percentile)",external__em__-6dB__r0,age >= 65,9489,0.00010538518284330944
+zhao,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,female,5249,0.21051628881691753
+zhao,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,male,5650,0.20477876106194692
+zhao,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,age < 65,6170,0.2165316045380875
+zhao,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,age >= 65,4729,0.19581306830196654
+zhao,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,female,10445,0.0009573958831976537
+zhao,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,male,11354,0.0007926721860137542
+zhao,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,age < 65,12310,0.0007311129163282137
+zhao,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,age >= 65,9489,0.0010538518284328724
+zhao,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,female,5249,0.19013145361021144
+zhao,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,male,5650,0.17221238938053096
+zhao,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,age < 65,6170,0.2029173419773096
+zhao,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,age >= 65,4729,0.15204060054979907
+ksqi,"source (CinC training, 5th percentile)",external__clean,female,10445,0.02336045955002397
+ksqi,"source (CinC training, 5th percentile)",external__clean,male,11354,0.018231460278316014
+ksqi,"source (CinC training, 5th percentile)",external__clean,age < 65,12310,0.021527213647441146
+ksqi,"source (CinC training, 5th percentile)",external__clean,age >= 65,9489,0.019601644008852337
+ksqi,"target (PTB-XL half A, 5th percentile)",external__clean,female,5249,0.0558201562202324
+ksqi,"target (PTB-XL half A, 5th percentile)",external__clean,male,5650,0.04637168141592918
+ksqi,"target (PTB-XL half A, 5th percentile)",external__clean,age < 65,6170,0.060453808752025884
+ksqi,"target (PTB-XL half A, 5th percentile)",external__clean,age >= 65,4729,0.0384859378304081
+ksqi,"source (CinC training, 5th percentile)",external__em__-6dB__r0,female,10445,0.37300143609382475
+ksqi,"source (CinC training, 5th percentile)",external__em__-6dB__r0,male,11354,0.3581997533908755
+ksqi,"source (CinC training, 5th percentile)",external__em__-6dB__r0,age < 65,12310,0.38253452477660443
+ksqi,"source (CinC training, 5th percentile)",external__em__-6dB__r0,age >= 65,9489,0.342923384972073
+ksqi,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,female,5249,0.5755381977519527
+ksqi,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,male,5650,0.5481415929203539
+ksqi,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,age < 65,6170,0.5781199351701782
+ksqi,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,age >= 65,4729,0.5394375132163248
+ksqi,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,female,10445,0.0975586404978459
+ksqi,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,male,11354,0.0864893429628325
+ksqi,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,age < 65,12310,0.10422420796100729
+ksqi,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,age >= 65,9489,0.07566656128148386
+ksqi,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,female,5249,0.21870832539531337
+ksqi,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,male,5650,0.19769911504424775
+ksqi,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,age < 65,6170,0.23533225283630466
+ksqi,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,age >= 65,4729,0.1719179530556143
+psqi,"source (CinC training, 5th percentile)",external__clean,female,10445,0.13805648635710865
+psqi,"source (CinC training, 5th percentile)",external__clean,male,11354,0.1262110269508543
+psqi,"source (CinC training, 5th percentile)",external__clean,age < 65,12310,0.1410235580828595
+psqi,"source (CinC training, 5th percentile)",external__clean,age >= 65,9489,0.1200337232585098
+psqi,"target (PTB-XL half A, 5th percentile)",external__clean,female,5249,0.06191655553438746
+psqi,"target (PTB-XL half A, 5th percentile)",external__clean,male,5650,0.05044247787610623
+psqi,"target (PTB-XL half A, 5th percentile)",external__clean,age < 65,6170,0.055429497568881714
+psqi,"target (PTB-XL half A, 5th percentile)",external__clean,age >= 65,4729,0.05667160076126032
+psqi,"source (CinC training, 5th percentile)",external__em__-6dB__r0,female,10445,0.03398755385351848
+psqi,"source (CinC training, 5th percentile)",external__em__-6dB__r0,male,11354,0.030473841817861502
+psqi,"source (CinC training, 5th percentile)",external__em__-6dB__r0,age < 65,12310,0.03428107229894395
+psqi,"source (CinC training, 5th percentile)",external__em__-6dB__r0,age >= 65,9489,0.02940246601327856
+psqi,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,female,5249,0.012002286149742858
+psqi,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,male,5650,0.007964601769911539
+psqi,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,age < 65,6170,0.009238249594813563
+psqi,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,age >= 65,4729,0.010784521040389072
+psqi,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,female,10445,0.8283389181426519
+psqi,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,male,11354,0.803153073806588
+psqi,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,age < 65,12310,0.832493907392364
+psqi,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,age >= 65,9489,0.7928127305300875
+psqi,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,female,5249,0.7290912554772337
+psqi,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,male,5650,0.6826548672566372
+psqi,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,age < 65,6170,0.7247974068071312
+psqi,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,age >= 65,4729,0.6792133643476422
+bassqi,"source (CinC training, 5th percentile)",external__clean,female,10445,0.03360459550023931
+bassqi,"source (CinC training, 5th percentile)",external__clean,male,11354,0.022194821208384674
+bassqi,"source (CinC training, 5th percentile)",external__clean,age < 65,12310,0.023720552396425676
+bassqi,"source (CinC training, 5th percentile)",external__clean,age >= 65,9489,0.03277479186426391
+bassqi,"target (PTB-XL half A, 5th percentile)",external__clean,female,5249,0.06325014288435893
+bassqi,"target (PTB-XL half A, 5th percentile)",external__clean,male,5650,0.04123893805309731
+bassqi,"target (PTB-XL half A, 5th percentile)",external__clean,age < 65,6170,0.04570502431118317
+bassqi,"target (PTB-XL half A, 5th percentile)",external__clean,age >= 65,4729,0.059843518714315924
+bassqi,"source (CinC training, 5th percentile)",external__em__-6dB__r0,female,10445,0.5939684059358545
+bassqi,"source (CinC training, 5th percentile)",external__em__-6dB__r0,male,11354,0.601902413246433
+bassqi,"source (CinC training, 5th percentile)",external__em__-6dB__r0,age < 65,12310,0.6031681559707555
+bassqi,"source (CinC training, 5th percentile)",external__em__-6dB__r0,age >= 65,9489,0.5915270312993993
+bassqi,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,female,5249,0.7719565631548866
+bassqi,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,male,5650,0.7803539823008849
+bassqi,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,age < 65,6170,0.7776337115072933
+bassqi,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,age >= 65,4729,0.774582364136181
+bassqi,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,female,10445,0.675825753949258
+bassqi,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,male,11354,0.6827549762198344
+bassqi,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,age < 65,12310,0.6757920389926888
+bassqi,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,age >= 65,9489,0.6841606070186532
+bassqi,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,female,5249,0.8384454181748905
+bassqi,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,male,5650,0.84
+bassqi,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,age < 65,6170,0.8403565640194489
+bassqi,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,age >= 65,4729,0.8378092620004229
+bsqi,"source (CinC training, 5th percentile)",external__clean,female,10445,0.20402106270943032
+bsqi,"source (CinC training, 5th percentile)",external__clean,male,11354,0.2265280958252598
+bsqi,"source (CinC training, 5th percentile)",external__clean,age < 65,12310,0.22558895207148655
+bsqi,"source (CinC training, 5th percentile)",external__clean,age >= 65,9489,0.2029718621561808
+bsqi,"target (PTB-XL half A, 5th percentile)",external__clean,female,5249,0.045151457420461005
+bsqi,"target (PTB-XL half A, 5th percentile)",external__clean,male,5650,0.05575221238938055
+bsqi,"target (PTB-XL half A, 5th percentile)",external__clean,age < 65,6170,0.05348460291734203
+bsqi,"target (PTB-XL half A, 5th percentile)",external__clean,age >= 65,4729,0.04694438570522308
+bsqi,"source (CinC training, 5th percentile)",external__em__-6dB__r0,female,10445,0.47027285782671135
+bsqi,"source (CinC training, 5th percentile)",external__em__-6dB__r0,male,11354,0.4933063237625507
+bsqi,"source (CinC training, 5th percentile)",external__em__-6dB__r0,age < 65,12310,0.49008935824532895
+bsqi,"source (CinC training, 5th percentile)",external__em__-6dB__r0,age >= 65,9489,0.47212561913794926
+bsqi,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,female,5249,0.0788721661268813
+bsqi,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,male,5650,0.092212389380531
+bsqi,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,age < 65,6170,0.08444084278768238
+bsqi,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,age >= 65,4729,0.08754493550433495
+bsqi,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,female,10445,0.7019626615605553
+bsqi,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,male,11354,0.7014268099348248
+bsqi,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,age < 65,12310,0.7064175467099918
+bsqi,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,age >= 65,9489,0.6955422067657288
+bsqi,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,female,5249,0.25547723375881115
+bsqi,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,male,5650,0.25946902654867254
+bsqi,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,age < 65,6170,0.2580226904376013
+bsqi,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,age >= 65,4729,0.25692535419750473
+learned,"source (CinC training, 5th percentile)",external__clean,female,10445,0.02584968884633798
+learned,"source (CinC training, 5th percentile)",external__clean,male,11354,0.03355645587458167
+learned,"source (CinC training, 5th percentile)",external__clean,age < 65,12310,0.021283509341998408
+learned,"source (CinC training, 5th percentile)",external__clean,age >= 65,9489,0.04099483612604071
+learned,"target (PTB-XL half A, 5th percentile)",external__clean,female,5249,0.041912745284816144
+learned,"target (PTB-XL half A, 5th percentile)",external__clean,male,5650,0.05628318584070802
+learned,"target (PTB-XL half A, 5th percentile)",external__clean,age < 65,6170,0.03743922204213934
+learned,"target (PTB-XL half A, 5th percentile)",external__clean,age >= 65,4729,0.06491858743920487
+learned,"source (CinC training, 5th percentile)",external__em__-6dB__r0,female,10445,0.5313547151747248
+learned,"source (CinC training, 5th percentile)",external__em__-6dB__r0,male,11354,0.5298573190065174
+learned,"source (CinC training, 5th percentile)",external__em__-6dB__r0,age < 65,12310,0.5165718927701056
+learned,"source (CinC training, 5th percentile)",external__em__-6dB__r0,age >= 65,9489,0.5487406470650227
+learned,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,female,5249,0.6265955420080016
+learned,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,male,5650,0.6398230088495576
+learned,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,age < 65,6170,0.6262560777957861
+learned,"target (PTB-XL half A, 5th percentile)",external__em__-6dB__r0,age >= 65,4729,0.6428420384859379
+learned,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,female,10445,0.223743417903303
+learned,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,male,11354,0.24202924079619514
+learned,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,age < 65,12310,0.2177091795288384
+learned,"source (CinC training, 5th percentile)",external__ma__-6dB__r0,age >= 65,9489,0.2534513647381178
+learned,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,female,5249,0.29015050485806826
+learned,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,male,5650,0.3221238938053097
+learned,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,age < 65,6170,0.2944894651539708
+learned,"target (PTB-XL half A, 5th percentile)",external__ma__-6dB__r0,age >= 65,4729,0.3226897864241912

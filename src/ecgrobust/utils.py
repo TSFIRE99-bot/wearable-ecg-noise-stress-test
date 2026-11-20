@@ -155,3 +155,38 @@ def environment_manifest(cfg: dict) -> dict:
         "packages": pkgs,
         "config": {k: v for k, v in cfg.items() if not k.startswith("_")},
     }
+
+
+def single_instance(lock: Path, stale_s: int = 300) -> None:
+    """Let only one process run a resumable script at a time.
+
+    A second launch waits while ``lock`` is fresh (a heartbeat thread touches it every minute) and then continues,
+    reusing whatever the first run cached. The lock is removed on exit; a crashed run leaves a stale lock that is
+    ignored after ``stale_s`` seconds.
+    """
+    import atexit
+    import threading
+
+    log = logging.getLogger("ecgrobust.lock")
+    lock = Path(lock)
+    while lock.exists() and time.time() - lock.stat().st_mtime < stale_s:
+        log.info("another run holds %s; waiting", lock.name)
+        time.sleep(120)
+    lock.parent.mkdir(parents=True, exist_ok=True)
+    lock.touch()
+    stop = threading.Event()
+
+    def beat():
+        while not stop.wait(60):
+            try:
+                lock.touch()
+            except OSError:
+                pass
+
+    threading.Thread(target=beat, daemon=True).start()
+
+    def release():
+        stop.set()
+        lock.unlink(missing_ok=True)
+
+    atexit.register(release)

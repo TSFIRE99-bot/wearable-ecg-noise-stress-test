@@ -1,13 +1,14 @@
-"""Secondary analysis: does the noise failure pattern replicate on the external test set?
+"""External replication under noise: the full noise grid on PTB-XL lead I.
 
     python scripts/external_noise.py --config configs/local.yaml --check
-    python scripts/external_noise.py --config configs/local.yaml
+    python scripts/external_noise.py --config configs/local.yaml [--n-jobs 6]
 
-The main study corrupted only the internal test set (evaluation.external_noise: false, since
-the full grid would need about 22k x 18 feature extractions). This script corrupts PTB-XL lead I
-with the same NSTDB test-partition noise, the same seeding and the same feature pipeline, but
-only for the conditions named in CONDITIONS, and scores the already-trained models (standard and
-augmented, all five seeds). Nothing is retrained and no threshold or calibrator is changed.
+The main study corrupted only the internal test set (evaluation.external_noise: false). This script
+corrupts PTB-XL lead I with the same NSTDB test-partition noise, the same seeding and the same feature
+pipeline as the internal grid (three noise types x six SNRs, realization 0), and scores the
+already-trained models (standard and augmented, all five seeds). Nothing is retrained and no threshold or
+calibrator is changed. A first version of this script covered four conditions (EM +6/0/-6 dB, MA -6 dB);
+its predictions are kept and only the missing conditions are added.
 
 --check   recompute a sample of stored features and predictions and stop; use it to confirm that
           the current Python environment reproduces the saved results before trusting new ones.
@@ -38,7 +39,7 @@ from ecgrobust.metrics import BINARY_METRICS, bootstrap_indices, paired_differen
 from ecgrobust.noise import Condition, NoiseBank, corrupt_for_test  # noqa: E402
 from ecgrobust.pipeline import binary_ids, feature_path  # noqa: E402
 from ecgrobust.splits import load_split  # noqa: E402
-from ecgrobust.utils import Paths, load_config, load_pickle, setup_logging  # noqa: E402
+from ecgrobust.utils import Paths, load_config, load_pickle, setup_logging, single_instance  # noqa: E402
 
 LOG = logging.getLogger("external_noise")
 
@@ -50,9 +51,9 @@ from sklearn.linear_model import LogisticRegression  # noqa: E402
 
 if tuple(int(v) for v in sklearn.__version__.split(".")[:2]) < (1, 8):
     LogisticRegression.multi_class = "deprecated"
-CONDITIONS = [("em", 6.0), ("em", 0.0), ("em", -6.0), ("ma", -6.0)]
+CONDITIONS = [(n, s) for n in ("bw", "ma", "em") for s in (24.0, 18.0, 12.0, 6.0, 0.0, -6.0)]
 MODELS, VARIANTS = ["rule", "logreg", "lgbm", "cnn"], ["standard", "augmented"]
-REPORT = ["auroc", "auprc", "f1", "sensitivity", "specificity", "ppv"]
+REPORT = ["auroc", "auprc", "f1", "sensitivity", "specificity", "ppv", "npv"]
 
 
 def bundles(paths: Paths, cfg: dict, variant: str, model: str) -> list[dict]:
@@ -109,12 +110,15 @@ def run_predictions(cfg: dict, paths: Paths, bank: NoiseBank, ext: dict) -> None
     for variant in VARIANTS:
         for model in MODELS:
             out = paths.predictions / f"external_noise__{variant}__{model}.parquet"
-            if out.exists():
+            old = pd.read_parquet(out) if out.exists() else None
+            done = set(old.condition) if old is not None else set()
+            todo = [(n, s) for n, s in CONDITIONS if Condition("external", n, s, 0).key not in done]
+            if not todo:
                 continue
             bs = bundles(paths, cfg, variant, model)
             cms = [M.load_cnn(b, cfg) for b in bs] if model == "cnn" else [None] * len(bs)
-            rows = []
-            for noise, snr in CONDITIONS:
+            rows = [] if old is None else [old]
+            for noise, snr in todo:
                 cond = Condition("external", noise, snr, 0)
                 feats = pd.read_parquet(feature_path(paths, cond.key)).loc[ids]
                 sigs = ([corrupt_for_test(ext["signals"][r], r, cond, bank, cfg["noise"]["seed"]) for r in ids]
@@ -139,26 +143,43 @@ def matrix(df: pd.DataFrame, ids: list[str], seeds: list[int]):
     return P, thr
 
 
-def run_tables(cfg: dict, paths: Paths, ext: dict) -> None:
-    meta, ids, seeds = ext["meta"], list(ext["meta"].index), cfg["seeds"]
-    y = meta.loc[ids, "af"].to_numpy(int)
-    boots = bootstrap_indices(len(ids), cfg["evaluation"]["bootstrap"], cfg["evaluation"]["bootstrap_seed"],
-                              meta.loc[ids, "patient_id"].to_numpy())
-    summ, rows = {}, []
-    for variant in VARIANTS:
-        for model in MODELS:
-            clean = pd.read_parquet(paths.predictions / f"binary__{variant}__{model}.parquet",
-                                    filters=[("condition", "==", "external__clean")])
-            noisy = pd.read_parquet(paths.predictions / f"external_noise__{variant}__{model}.parquet")
-            for key, df in [("external__clean", clean)] + list(noisy.groupby("condition")):
-                P, thr = matrix(df, ids, seeds)
-                s = summarize_condition(y, P, thr, boots)
-                summ[(variant, model, key)] = s
-                row = {"variant": variant, "model": model, "condition": key}
-                for k in REPORT:
-                    row[k], row[f"{k}_sd"], row[f"{k}_lo"], row[f"{k}_hi"] = s[k], s[f"{k}_sd"], s[f"{k}_lo"], s[f"{k}_hi"]
-                rows.append(row)
-                LOG.info("%s %s %s AUROC %.3f sens %.3f spec %.3f", variant, model, key, s["auroc"], s["sensitivity"], s["specificity"])
+_BOOTS: dict = {}
+
+
+def _summarize_job(cfg: dict, variant: str, model: str, key: str) -> tuple:
+    """One (variant, model, condition) summary; run in a worker process. The bootstrap indices are rebuilt in
+    each worker from the same seed, so every summary uses identical, paired replicates."""
+    paths = Paths.from_cfg(cfg)
+    if "meta" not in _BOOTS:   # once per worker process
+        _BOOTS["meta"] = load_dataset(cfg, "external")["meta"]
+    meta = _BOOTS["meta"]
+    ids, seeds = list(meta.index), cfg["seeds"]
+    if "boots" not in _BOOTS:
+        _BOOTS["boots"] = bootstrap_indices(len(ids), cfg["evaluation"]["bootstrap"], cfg["evaluation"]["bootstrap_seed"],
+                                            meta.loc[ids, "patient_id"].to_numpy())
+    if key == "external__clean":
+        df = pd.read_parquet(paths.predictions / f"binary__{variant}__{model}.parquet",
+                             filters=[("condition", "==", "external__clean")])
+    else:
+        df = pd.read_parquet(paths.predictions / f"external_noise__{variant}__{model}.parquet",
+                             filters=[("condition", "==", key)])
+    P, thr = matrix(df, ids, seeds)
+    return (variant, model, key), summarize_condition(meta.loc[ids, "af"].to_numpy(int), P, thr, _BOOTS["boots"])
+
+
+def run_tables(cfg: dict, paths: Paths, ext: dict, n_jobs: int = 6) -> None:
+    from joblib import Parallel, delayed
+
+    keys = ["external__clean"] + [Condition("external", n, s, 0).key for n, s in CONDITIONS]
+    jobs = [(v, m, k) for v in VARIANTS for m in MODELS for k in keys]
+    res = Parallel(n_jobs=n_jobs, verbose=5)(delayed(_summarize_job)(cfg, v, m, k) for v, m, k in jobs)
+    summ, rows = dict(res), []
+    for (variant, model, key), s in res:
+        row = {"variant": variant, "model": model, "condition": key}
+        for k in REPORT:
+            row[k], row[f"{k}_sd"], row[f"{k}_lo"], row[f"{k}_hi"] = s[k], s[f"{k}_sd"], s[f"{k}_lo"], s[f"{k}_hi"]
+        rows.append(row)
+        LOG.info("%s %s %s AUROC %.3f sens %.3f spec %.3f", variant, model, key, s["auroc"], s["sensitivity"], s["specificity"])
     pd.DataFrame(rows).to_csv(paths.tables / "external_noise.csv", index=False)
 
     j = {k: i for i, k in enumerate(BINARY_METRICS)}
@@ -191,17 +212,20 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", default="configs/default.yaml")
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--n-jobs", type=int, default=6)
     a = ap.parse_args()
     setup_logging()
     cfg = load_config(a.config)
     paths = Paths.from_cfg(cfg)
+    if not a.check:
+        single_instance(paths.root / "revision" / "external_noise.lock")
     bank = NoiseBank(load_dataset(cfg, "nstdb"), cfg["noise"]["train_fraction"])
     if a.check:
         sys.exit(0 if check(cfg, paths, bank) else 1)
     ext = load_dataset(cfg, "external")
     run_features(cfg, paths, bank, ext)
     run_predictions(cfg, paths, bank, ext)
-    run_tables(cfg, paths, ext)
+    run_tables(cfg, paths, ext, a.n_jobs)
 
 
 if __name__ == "__main__":

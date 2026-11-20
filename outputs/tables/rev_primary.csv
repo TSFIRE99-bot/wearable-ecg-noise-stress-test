@@ -1,0 +1,7 @@
+hypothesis,metric,A,B,diff,lo,hi,p,resampling_unit,p_holm
+"H1 internal EM -6 dB: sensitivity, gradient boosting - CNN",sensitivity,0.7601351351351354,0.41925675675675683,0.3408783783783786,0.28673889631610266,0.3956172342644656,0.001,recordings (fresh noise realizations 1-4),0.006
+"H2 internal EM -6 dB: specificity, CNN - gradient boosting",specificity,0.983311125916056,0.8358094603597601,0.14750166555629585,0.13579087577598647,0.15813751826614555,0.001,recordings (fresh noise realizations 1-4),0.006
+"H3 external EM -6 dB: sensitivity, gradient boosting - CNN",sensitivity,0.7254953764861289,0.4966974900924694,0.22879788639365894,0.20579785274943857,0.253479997985383,0.001,patients (realization 0),0.006
+"H4 external EM -6 dB: specificity, CNN - gradient boosting",specificity,0.9827261523293075,0.8608035494207545,0.12192260290855306,0.11780721339539617,0.126158817203152,0.001,patients (realization 0),0.006
+"H5 internal MA -6 dB: CNN sensitivity, augmented - standard",sensitivity,0.6652027027027025,0.3604729729729728,0.3047297297297297,0.26882138251819143,0.34206966338113404,0.001,recordings (fresh noise realizations 1-4),0.006
+"H6 internal EM -6 dB: gradient-boosting specificity, augmented - standard",specificity,0.9381412391738841,0.8358094603597601,0.10233177881412403,0.09435002859998094,0.1101531597487481,0.001,recordings (fresh noise realizations 1-4),0.006

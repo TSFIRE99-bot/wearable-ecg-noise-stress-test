@@ -39,7 +39,12 @@ ANON_SUBS = [
     (r"https://github\.com/TSFIRE99-bot/wearable-ecg-noise-stress-test", "[repository link withheld for anonymous review]"),
     (r"https://doi\.org/10\.5281/zenodo\.\d+", "[archive DOI withheld for anonymous review]"),
     (AUTHOR, "[author name withheld for anonymous review]"),
+    # IOP: funding information is removed from double-anonymous manuscripts (re-added after review).
+    (r"\s*This research received no specific grant from any funding agency in the\s+public, commercial or "
+     r"not-for-profit\s+sectors\.", ""),
 ]
+# IOP: in double-anonymous journals the ethical statement goes in the submission form, not the manuscript.
+ANON_SKIP_SECTIONS = {"Ethical statement"}
 
 INLINE = re.compile(r"(\*\*[^*]+\*\*|\*[^*\s][^*]*\*|`[^`]+`|<sub>[^<]+</sub>)")
 
@@ -79,14 +84,7 @@ sec = doc.sections[0]
 sec.page_width, sec.page_height = Inches(8.5), Inches(11)
 for side in ("left_margin", "right_margin", "top_margin", "bottom_margin"):
     setattr(sec, side, Inches(1))
-# continuous line numbers in the margin, so reviewers can refer to lines
-ln_num = OxmlElement("w:lnNumType")
-ln_num.set(qn("w:countBy"), "1"); ln_num.set(qn("w:restart"), "continuous"); ln_num.set(qn("w:distance"), "283")
-cols = sec._sectPr.find(qn("w:cols"))
-if cols is not None:
-    cols.addprevious(ln_num)
-else:
-    sec._sectPr.append(ln_num)
+# No line numbers: IOP adds them automatically on submission.
 
 st = doc.styles["Normal"]
 st.font.name, st.font.size = FONT, Pt(12)
@@ -259,8 +257,12 @@ while i < len(lines):
                 i += 1
         continue
     if ln.startswith("## "):
-        flush(); section = ln[3:].strip()
-        doc.add_heading(section, level=1); i += 1; continue
+        flush(); section = ln[3:].strip(); i += 1
+        if ANONYMOUS and section in ANON_SKIP_SECTIONS:
+            while i < len(lines) and not lines[i].startswith("## "):
+                i += 1
+            continue
+        doc.add_heading(section, level=1); continue
     if ln.startswith("### "):
         flush(); doc.add_heading(ln[4:].strip(), level=2); i += 1; continue
     fm = re.match(r"!\[([^\]]*)\]\(([^)]+)\)", s)
